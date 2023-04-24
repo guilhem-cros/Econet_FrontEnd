@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+///Custom widget corresponding to a card containing info about an Ecospot
 class EcospotCard extends StatefulWidget {
 
   //final Ecospot displayedEcospot;

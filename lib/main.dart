@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:image_upload/service/storage_service.dart';
-import 'package:image_upload/widget/EcospotCard.dart';
-import 'package:image_upload/widget/ImagePicker.dart';
+import 'package:image_upload/services/storage_service.dart';
+import 'package:image_upload/widgets/ecospot_card.dart';
+import 'package:image_upload/widgets/image_picker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
