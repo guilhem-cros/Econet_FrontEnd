@@ -31,7 +31,7 @@ class ImagePicker extends StatefulWidget {
 class _ImagePickerState extends State<ImagePicker>{
 
   /// The currently displayed file
-  File? _imageFile = null;
+  File? _imageFile;
 
    /// Set the current file to a new specified file
    /// and handling the change in the UI (using state)
@@ -53,10 +53,7 @@ class _ImagePickerState extends State<ImagePicker>{
                 type: FileType.custom,
                 allowedExtensions: ['png', 'jpg', 'jpeg']
             );
-            if(result == null){
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No file selected')));
-            }
-            else {
+            if(result != null){
               setCurrentFile(result.files.single);
               widget.setSelectedImage(result.files.single);
             }
