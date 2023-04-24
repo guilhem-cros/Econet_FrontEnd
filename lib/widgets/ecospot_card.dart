@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../models/Ecospot.dart';
+
 ///Custom widget corresponding to a card containing info about an Ecospot
 class EcospotCard extends StatefulWidget {
 

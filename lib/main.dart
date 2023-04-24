@@ -5,6 +5,8 @@ import 'package:image_upload/services/storage_service.dart';
 import 'package:image_upload/widgets/ecospot_card.dart';
 import 'package:image_upload/widgets/image_picker.dart';
 
+import 'models/client.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
