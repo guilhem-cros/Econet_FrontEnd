@@ -5,6 +5,7 @@ import '../screens/authenticate/DTOs/loginuser_dto.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final clientDAO = ClientDAO();
 
   Future signInEmailPassword(LoginUser _login) async {
     try {
@@ -29,7 +30,7 @@ class AuthService {
 
       // Envoie les données à l'API après la création réussie de l'utilisateur
       if (user != null) {
-        await ClientDAO.createClient(
+        await clientDAO.createClient(
           full_name: full_name,
           pseudo: pseudo,
           email: _login.email.toString(),

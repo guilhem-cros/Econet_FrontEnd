@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:image_upload/utils/constants.dart';
+import '../models/client.dart';
 
 class ClientDAO {
 
-  static Future<void> createClient({
+  Future<void> createClient({
     required String full_name,
     required String pseudo,
     required String email,
@@ -35,7 +36,7 @@ class ClientDAO {
     }
   }
 
-  static Future<Map<String, dynamic>> checkEmailPseudoUnique({
+  Future<Map<String, dynamic>> checkEmailPseudoUnique({
     required String email,
     required String pseudo,
   }) async {
@@ -53,6 +54,18 @@ class ClientDAO {
     } else {
       // If the server returns an error response
       throw Exception('Failed to check email and pseudo uniqueness');
+    }
+  }
+
+  Future<ClientModel> getByFirebaseId({required String uid}) async{
+    final String apiUrl = Constants.baseUrl + Constants.clientEndpoint + Constants.firebaseEndpoint + uid;
+    final response = await http.get(
+        Uri.parse(apiUrl));
+    if (response.statusCode == 200){
+      return ClientModel.fromJson(jsonDecode(response.body));
+    }
+    else{
+      throw Exception("Failed to load client");
     }
   }
 

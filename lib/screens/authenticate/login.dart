@@ -126,47 +126,56 @@ class _Login extends State<Login> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Column(
+      body: Stack(
         children: [
-          Wave(0.75, 0.4, 0.5, positionTop: 0, positionLeft: 0, positionRight: 0,
-              positionTopText: 70, positionLeftText: 30, height: 200),
-          Form(
-            key: _formKey,
+          SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.only(left: 40.0, right: 40.0),
+              padding: const EdgeInsets.only(top: 200),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const SizedBox(height: 25.0),
-                  emailField,
-                  const SizedBox(height: 35.0),
-                  passwordField,
-                  const SizedBox(height: 35.0),
-                  loginEmailPasswordButon,
-                  const SizedBox(height: 10.0),
-                  GestureDetector(
-                    onTap: () => PasswordReset.resetPassword(context, _auth),
-                    child: const Text(
-                      'Mot de passe oublié?',
-                      style: TextStyle(
-                          fontSize: 15, decoration: TextDecoration.underline),
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 40.0, right: 40.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          const SizedBox(height: 25.0),
+                          emailField,
+                          const SizedBox(height: 35.0),
+                          passwordField,
+                          const SizedBox(height: 35.0),
+                          loginEmailPasswordButon,
+                          const SizedBox(height: 10.0),
+                          GestureDetector(
+                            onTap: () => PasswordReset.resetPassword(context, _auth),
+                            child: const Text(
+                              'Mot de passe oublié?',
+                              style: TextStyle(
+                                  fontSize: 15, decoration: TextDecoration.underline),
+                            ),
+                          ),
+                          const SizedBox(height: 5.0),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Pas encore de compte?',style: TextStyle(fontSize: 15)),
+                              txtbutton,
+                            ],
+                          ),
+                          const SizedBox(height: 15.0),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 5.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Pas encore de compte?',style: TextStyle(fontSize: 15)),
-                      txtbutton,
-                    ],
-                  ),
-                  const SizedBox(height: 15.0),
                 ],
               ),
             ),
           ),
+          Wave(0.75, 0.4, 0.5, positionTop: 0, positionLeft: 0, positionRight: 0,
+              positionTopText: 70, positionLeftText: 30, height: 200),
         ],
       ),
     );
