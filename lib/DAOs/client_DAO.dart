@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:image_upload/utils/constants.dart';
 
-class ApiService {
+class ClientDAO {
 
   static Future<void> createClient({
     required String full_name,
