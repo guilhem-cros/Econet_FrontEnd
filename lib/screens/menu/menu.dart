@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_upload/screens/home/home.dart';
 import 'package:image_upload/screens/menu/menu_app_bar.dart';
 
 import '../../widgets/menu_item.dart';
@@ -13,13 +14,20 @@ class Menu extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MenuAppBar(),
+      appBar: MenuAppBar(),
       body: Column(
-          children: const [
+          children: [
             ProfilePicDisplay(
-              profilePicUrl: 'https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8&w=1000&q=80',
+              profilePicUrl: Home.currentClient!.profilePicUrl,
             ),
-            MenuItem(label: "Favoris", icon: Icon(Icons.star), iconColor: Color.fromRGBO(255, 230, 0, 1),)
+            Text(Home.currentClient!.pseudo, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+            const SizedBox(height: 50,),
+            const MenuItem(label: "Ecospots favoris", icon: Icon(Icons.star), iconColor: Color.fromRGBO(255, 230, 0, 1),),
+            const SizedBox(height: 25,),
+            const MenuItem(label: "Mes Ecospots", icon: Icon(Icons.pin_drop_outlined), iconColor: Color.fromRGBO(96, 96, 96, 1)),
+            const SizedBox(height: 25,),
+            if(Home.currentClient!.isAdmin)
+              const MenuItem(label: 'Panel Admin', icon: Icon(Icons.admin_panel_settings_sharp), iconColor: Color.fromRGBO(96, 96, 96, 1))
           ]
       )
     );
