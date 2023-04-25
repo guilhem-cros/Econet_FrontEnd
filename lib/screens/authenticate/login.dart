@@ -136,7 +136,7 @@ class _Login extends State<Login> {
                   Form(
                     key: _formKey,
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 40.0, right: 40.0),
+                      padding: const EdgeInsets.only(left: 20, right: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
