@@ -17,6 +17,7 @@ class Register extends StatefulWidget{
 
 class _Register extends State<Register>{
   final AuthService _auth = AuthService();
+  final clientDAO = ClientDAO();
 
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
@@ -185,7 +186,7 @@ class _Register extends State<Register>{
         padding: const EdgeInsets.all(20.0),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            final checkResult = await ClientDAO.checkEmailPseudoUnique(
+            final checkResult = await clientDAO.checkEmailPseudoUnique(
               email: _email.text,
               pseudo: _pseudo.text,
             );
