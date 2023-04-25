@@ -39,16 +39,16 @@ class ProfilePicDisplay extends StatelessWidget {
         backgroundColor: color,
         child: CircleAvatar(
           backgroundImage: image as ImageProvider,
-          radius: 70,
+          backgroundColor: Colors.white,
+          radius: 73,
         ),
       );
     }
 
     // Builds Edit Icon on Profile Picture
     Widget buildEditIcon(Color color) => buildCircle(
-        all: 0.1,
         child: IconButton(
-          icon: const Icon(Icons.edit),
+          icon: const Icon(Icons.photo_camera),
           iconSize: 20,
           color: color,
           onPressed: (){print('TODO');},
@@ -57,12 +57,12 @@ class ProfilePicDisplay extends StatelessWidget {
     // Builds/Makes Circle for Edit Icon on Profile Picture
     Widget buildCircle({
       required Widget child,
-      required double all,
     }) =>
         ClipOval(
             child: Container(
-              padding: EdgeInsets.all(all),
-              color: Colors.white,
+              color: const Color.fromRGBO(238, 238 , 238, 1),
+              width: 38,
+              height: 38,
               child: child,
             ));
 }

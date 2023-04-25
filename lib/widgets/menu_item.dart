@@ -18,7 +18,7 @@ class MenuItem extends StatelessWidget{
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Icon(icon.icon, color: iconColor, size: 30),
+        Icon(icon.icon, color: iconColor, size: 36),
         const SizedBox(width: 10),
         Container(
           decoration: const BoxDecoration(
@@ -26,7 +26,7 @@ class MenuItem extends StatelessWidget{
               bottom: BorderSide(width: 1, color: Color.fromRGBO(208, 208, 208, 1))
             )
           ),
-          width: 250,
+          width: 260,
           child:
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

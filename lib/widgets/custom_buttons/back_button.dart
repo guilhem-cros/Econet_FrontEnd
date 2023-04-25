@@ -17,7 +17,7 @@ class CustomBackButton extends StatelessWidget{
         shadowColor: Colors.transparent,
       ),
       icon: const Icon(Icons.arrow_back_ios_rounded, color: color, size: 20),
-      label: const Text("Retour", style: TextStyle(color: color, fontSize: 14),),
+      label: const Text("Retour", style: TextStyle(color: color, fontSize: 16),),
     );
   }
 
