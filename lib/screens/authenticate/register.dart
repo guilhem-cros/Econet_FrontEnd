@@ -28,6 +28,17 @@ class _Register extends State<Register>{
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  void showPopUp(BuildContext context, String message){
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(message),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -190,32 +201,21 @@ class _Register extends State<Register>{
               email: _email.text,
               pseudo: _pseudo.text,
             );
-
-            if (!checkResult['isUnique']) {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: Text(checkResult['errorMessage']),
-                  );
-                },
-              );
-            } else {
-              dynamic result = await _auth.registerEmailPassword(
+            if(!checkResult.error){
+              if (!checkResult.data!['isUnique']) {
+                showPopUp(context, checkResult.data!['errorMessage']);
+              } else {
+                dynamic result = await _auth.registerEmailPassword(
                 LoginUser(email: _email.text, password: _password.text),
                 _full_name.text,
                 _pseudo.text,
-              );
-
-              if (result.uid == null) { //null means unsuccessfull authentication
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        content: Text(result.toString()),
-                      );
-                    });
-              }
+                );
+                if (result.uid == null) { //null means unsuccessfull authentication
+                  showPopUp(context, result.toString());
+                }
+            }
+            } else{
+              showPopUp(context, checkResult.errorMessage!);
             }
           }
         },

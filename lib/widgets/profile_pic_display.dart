@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 class ProfilePicDisplay extends StatelessWidget {
 
   final String profilePicUrl;
-  //final VoidCallback onPressed;
+  final VoidCallback onPressed;
 
   const ProfilePicDisplay({
     super.key,
     required this.profilePicUrl,
-    //required this.onPressed
+    required this.onPressed
   });
 
   @override
@@ -51,7 +51,7 @@ class ProfilePicDisplay extends StatelessWidget {
           icon: const Icon(Icons.photo_camera),
           iconSize: 20,
           color: color,
-          onPressed: (){print('TODO');},
+          onPressed: onPressed,
         ));
 
     // Builds/Makes Circle for Edit Icon on Profile Picture

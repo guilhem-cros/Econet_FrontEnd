@@ -1,71 +1,130 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/utils/constants.dart';
 import '../models/client.dart';
 
+/// DAO used to get client objects from the DB
 class ClientDAO {
 
-  Future<void> createClient({
-    required String full_name,
+  /// Create a client in the DB
+  /// Need the full_name, the pseudo, the email and the firebaseId of the client
+  /// Return an APIResponse of a ClientModel, containing the created client if no everything
+  /// worked, an error message if not
+  Future<APIResponse<ClientModel>> createClient({
+    required String fullName,
     required String pseudo,
     required String email,
     required String firebaseId,
   }) async {
     final String apiUrl = Constants.baseUrl + Constants.clientEndpoint;
 
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      body: jsonEncode({
-        'full_name': full_name,
-        'pseudo': pseudo,
-        'email': email,
-        'firebaseId': firebaseId,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: jsonEncode({
+          'full_name': fullName,
+          'pseudo': pseudo,
+          'email': email,
+          'firebaseId': firebaseId,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      print('Client created successfully');
-    } else if (response.statusCode == 400) {
-      throw Exception(response.body); // Récupérer le message d'erreur
-    } else {
-      print('Failed to create client');
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
+      } else {
+        return APIResponse<ClientModel>(error: true, errorMessage: jsonData.error);
+      }
+
+    } catch (err){
+      return APIResponse<ClientModel>(error: true, errorMessage: err.toString());
     }
   }
 
-  Future<Map<String, dynamic>> checkEmailPseudoUnique({
+  /// Check if a specified string doesn't match any existing email or pseudo in the DB
+  /// Return an APIResponse containing the result of the request if no error
+  /// An APIResponse containing an error message if not
+  Future<APIResponse<Map<String, dynamic>>> checkEmailPseudoUnique({
     required String email,
     required String pseudo,
   }) async {
     final String apiUrl = Constants.baseUrl + Constants.clientEndpoint + Constants.checkEndpoint;
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email, 'pseudo': pseudo}),
-    );
 
-    if (response.statusCode == 201) {
-      // If the server returns a successful response
-      Map<String, dynamic> responseBody = json.decode(response.body);
-      return responseBody;
-    } else {
-      // If the server returns an error response
-      throw Exception('Failed to check email and pseudo uniqueness');
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email, 'pseudo': pseudo}),
+      );
+
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 201) {
+        Map<String, dynamic> data = jsonData;
+        // If the server returns a successful response
+        return APIResponse<Map<String, dynamic>>(data: data);
+      } else {
+        // If the server returns an error response
+        return APIResponse<Map<String, dynamic>>(error: true, errorMessage: jsonData.error);
+      }
+    }catch(err){
+      return APIResponse<Map<String, dynamic>>(error: true, errorMessage: err.toString());
     }
   }
 
-  Future<ClientModel> getByFirebaseId({required String uid}) async{
+
+  /// Get a client by its firebaseId from the DB
+  /// Return an APIResponse of a clientModel containing the matched client if the request worked
+  /// An APIResponse containing an error message if not
+  Future<APIResponse<ClientModel>> getByFirebaseId({required String uid}) async{
     final String apiUrl = Constants.baseUrl + Constants.clientEndpoint + Constants.firebaseEndpoint + uid;
-    final response = await http.get(
-        Uri.parse(apiUrl));
-    if (response.statusCode == 200){
-      return ClientModel.fromJson(jsonDecode(response.body));
+
+    try {
+      final response = await http.get(
+          Uri.parse(apiUrl));
+
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
+      }
+      else {
+        return APIResponse<ClientModel>(error: true, errorMessage: jsonData.error);
+      }
+    } catch(err){
+      return APIResponse<ClientModel>(error: true, errorMessage: err.toString());
     }
-    else{
-      throw Exception("Failed to load client");
+  }
+
+
+  /// Update the specified client in the database
+  /// Return an APIResponse containing the just updated client if request worked
+  /// An APIResponse containing an error message if not
+  Future<APIResponse<ClientModel>> updateClient({
+    required ClientModel updateClient,
+  }) async {
+    final String apiUrl = '${Constants.baseUrl}${Constants.clientEndpoint}/${updateClient.id}';
+
+    try {
+      final response = await http.put(
+        Uri.parse(apiUrl),
+        body: jsonEncode(updateClient.toJson()),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
+      } else {
+        return APIResponse<ClientModel>(error: true, errorMessage: jsonData.body.error);
+      }
+    } catch (err){
+      return APIResponse<ClientModel>(error: true, errorMessage: err.toString());
     }
   }
 

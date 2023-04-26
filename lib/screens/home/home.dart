@@ -1,5 +1,7 @@
 import 'package:image_upload/DAOs/client_DAO.dart';
+import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/client.dart';
+import 'package:image_upload/screens/error/error_screen.dart';
 import 'package:image_upload/screens/menu/menu.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +19,7 @@ class Home extends StatefulWidget{
 
 class _Home extends State<Home>{
 
-  late Future<ClientModel> _clientModel;
+  late Future<APIResponse<ClientModel>> _clientModel;
 
   @override
   void initState() {
@@ -30,19 +32,34 @@ class _Home extends State<Home>{
     Home.currentClient = clientModel;
   }
 
+  void showPopUp(BuildContext context, String message){
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(message),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       body: Center(
-        child: FutureBuilder<ClientModel>(
+        child: FutureBuilder<APIResponse<ClientModel>>(
           future: _clientModel,
           builder: (context,snapshot){
             if(snapshot.hasData){
-              setCurrentClient(snapshot.data!);
-              return const Menu();
+              if(snapshot.data!.error){
+                return ErrorScreen(errorMessage: snapshot.data!.errorMessage!);
+              } else {
+                setCurrentClient(snapshot.data!.data!);
+                return Menu();
+              }
             }else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
+              return ErrorScreen(errorMessage: snapshot.error.toString());
             }
             return const CircularProgressIndicator();
           },

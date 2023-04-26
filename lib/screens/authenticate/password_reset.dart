@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_upload/services/auth.dart';
 
@@ -10,17 +9,17 @@ class PasswordReset{
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Réinitialisation du mot de passe"),
+          title: const Text("Réinitialisation du mot de passe"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Veuillez entrer votre adresse e-mail :"),
+              const Text("Veuillez entrer votre adresse e-mail :"),
               TextField(controller: emailController),
             ],
           ),
           actions: [
             TextButton(
-              child: Text("Annuler"),
+              child: const Text("Annuler"),
               onPressed: () {
                 Navigator.of(context).pop();
               },

@@ -3,10 +3,13 @@ import 'package:image_upload/DAOs/client_DAO.dart';
 import '../models/firebaseuser.dart';
 import '../screens/authenticate/DTOs/loginuser_dto.dart';
 
+/// Class handling authentication via firebase
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final clientDAO = ClientDAO();
 
+  /// Login to an existing firebase account using an email and a password
+  /// Return the logged client
   Future signInEmailPassword(LoginUser _login) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -20,7 +23,9 @@ class AuthService {
     }
   }
 
-  Future registerEmailPassword(LoginUser _login, String full_name, String pseudo) async {
+  /// Register an user into firebase and then use its firbase id to store the client
+  /// into the database
+  Future registerEmailPassword(LoginUser _login, String fullName, String pseudo) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
@@ -31,7 +36,7 @@ class AuthService {
       // Envoie les données à l'API après la création réussie de l'utilisateur
       if (user != null) {
         await clientDAO.createClient(
-          full_name: full_name,
+          fullName: fullName,
           pseudo: pseudo,
           email: _login.email.toString(),
           firebaseId: user.uid,
@@ -46,6 +51,7 @@ class AuthService {
     }
   }
 
+  /// Handle the password reset
   Future resetPassword({required String email}) async {
     try{
       return await _auth
@@ -58,6 +64,7 @@ class AuthService {
 
   //TODO: Sign in with Google
 
+  /// Disconnect the curretly connected user from the firebase instance
   Future signOut() async {
     try {
       return await _auth.signOut();
