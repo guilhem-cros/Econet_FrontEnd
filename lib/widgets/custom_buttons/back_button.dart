@@ -15,6 +15,7 @@ class CustomBackButton extends StatelessWidget{
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
+        elevation: 0,
       ),
       icon: const Icon(Icons.arrow_back_ios_rounded, color: color, size: 20),
       label: const Text("Retour", style: TextStyle(color: color, fontSize: 16),),
