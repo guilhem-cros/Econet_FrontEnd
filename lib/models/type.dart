@@ -8,6 +8,10 @@ TypeModel typeModelFromJson(String str) => TypeModel.fromJson(json.decode(str));
 
 String typeModelToJson(TypeModel data) => json.encode(data.toJson());
 
+List<TypeModel> typeListFromJson(String str) => List<TypeModel>.from(json.decode(str).map((x) => TypeModel.fromJson(x)));
+
+String typeListToJson(List<TypeModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+
 class TypeModel {
   TypeModel({
     required this.id,

@@ -31,7 +31,7 @@ class _Login extends State<Login> {
         autofocus: false,
         validator: (value) {
           if (value != null) {
-            if (value.contains('@') && value.endsWith('.com')) {
+            if (value.contains('@') && (value.endsWith('.com') || value.endsWith('.fr') || value.endsWith('.net'))) {
               return null;
             }
             return 'Entrez une adresse mail valide';

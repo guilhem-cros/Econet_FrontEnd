@@ -1,36 +1,42 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../utils/extensions.dart';
 
 class EcospotListItem extends StatelessWidget{
   final String spotName;
   final String spotType;
-  final Icon iconType;
+  final String imageUrlType;
   final Color spotColor;
 
-  const EcospotListItem({super.key, required this.spotName, required this.spotType, required this.iconType, required this.spotColor});
+  const EcospotListItem({super.key, required this.spotName, required this.spotType, required this.imageUrlType, required this.spotColor});
+
 
   @override
   Widget build(BuildContext context){
     return Container(
+      margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-          color: spotColor
+          color: spotColor.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(10.0),
           ),
-      width: 250,
+      width: 0.85*MediaQuery.of(context).size.width,
+      height: 50,
+      alignment: Alignment.center,
       child:
       Container(
-          decoration: const BoxDecoration(
+        padding: const EdgeInsets.only(bottom: 5),
+          decoration: BoxDecoration(
               border: Border(
-                  bottom: BorderSide(width: 1, color: Color.fromRGBO(208, 208, 208, 1))
+                  bottom: BorderSide(width: 1, color: const Color.fromRGBO(208, 208, 208, 1).withOpacity(0.8))
               )
           ),
-          width: 250,
+          width: 0.75*MediaQuery.of(context).size.width,
           child:
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('$spotName - ', style: const TextStyle(color: Color.fromRGBO(45, 45, 45, 1), fontSize: 22, fontWeight: FontWeight.bold)),
-              Text(spotType, style: const TextStyle(color: Color.fromRGBO(45, 45, 45, 1), fontSize: 22, fontWeight: FontWeight.bold)),
-              Icon(iconType.icon , size: 18),
+              Text('$spotName - $spotType'.toTitleCase(), style: TextStyle(color: const Color.fromRGBO(45, 45, 45, 1).withOpacity(0.7), fontSize: 20, fontWeight: FontWeight.bold)),
+              Image.network(imageUrlType, height: 30),
             ],
           )
       ),
