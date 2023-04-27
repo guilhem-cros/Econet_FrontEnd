@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_upload/screens/authenticate/DTOs/loginuser_dto.dart';
 import 'package:image_upload/services/auth.dart';
 import '../../DAOs/client_DAO.dart';
-import '../wave.dart';
 
 class RegisterForm extends StatefulWidget {
   final Function? onRegistered;
@@ -265,8 +264,6 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             ),
           ),
-          Wave(0.25, 0.6, 0.75, positionTop: 0, positionLeft: 0, positionRight: 0,
-              positionTopText: 40, positionRightText: 30, height: 150),
         ],
       ),
     );

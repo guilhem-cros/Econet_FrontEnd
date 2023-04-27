@@ -47,11 +47,7 @@ class _AppBar extends StatelessWidget with PreferredSizeWidget{
       backgroundColor: Colors.transparent,
       elevation: 0,
       shadowColor: Colors.transparent,
-      leading: CustomBackButton(
-        onPressed: (){
-
-        },
-      ),
+      leading: const CustomBackButton(),
       leadingWidth: 110,
     );
   }

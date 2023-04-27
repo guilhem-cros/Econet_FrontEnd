@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/widgets/wave.dart';
-import '../../DAOs/client_DAO.dart';
 import '../../widgets/forms/register_form.dart';
 
 class Register extends StatefulWidget{
@@ -42,7 +41,7 @@ class _Register extends State<Register>{
             onToggleView: widget.toggleView,
           ),
           Wave(0.25, 0.6, 0.75, positionTop: 0, positionLeft: 0, positionRight: 0,
-              positionTopText: 40, positionRightText: 30, height: 150),
+              positionTopText: 40, positionRightText: 30, height: 150, label: "Bienvenue !",),
         ],
       ),
     );

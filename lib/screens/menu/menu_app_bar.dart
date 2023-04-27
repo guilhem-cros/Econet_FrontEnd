@@ -19,7 +19,8 @@ class MenuAppBar extends StatelessWidget with PreferredSizeWidget{
       backgroundColor: Colors.transparent,
       shadowColor: Colors.transparent,
       leadingWidth: 110,
-      leading: CustomBackButton(onPressed: () {print("todo");},),
+      elevation: 0,
+      leading: const CustomBackButton(),
       actions: [
         CustomIconButton(onPressed: () {print("todo");}, icon: const Icon(Icons.edit),),
         const SizedBox(width: 10,),
