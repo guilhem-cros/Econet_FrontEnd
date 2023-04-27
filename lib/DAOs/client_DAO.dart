@@ -38,7 +38,7 @@ class ClientDAO {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
       } else {
-        return APIResponse<ClientModel>(error: true, errorMessage: jsonData.error);
+        return APIResponse<ClientModel>(error: true, errorMessage: jsonData['message']);
       }
 
     } catch (err){
@@ -124,7 +124,7 @@ class ClientDAO {
         return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
       }
       else {
-        return APIResponse<ClientModel>(error: true, errorMessage: jsonData.error);
+        return APIResponse<ClientModel>(error: true, errorMessage: jsonData['message']);
       }
     } catch(err){
       return APIResponse<ClientModel>(error: true, errorMessage: err.toString());
@@ -153,7 +153,7 @@ class ClientDAO {
       if (response.statusCode == 200) {
         return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
       } else {
-        return APIResponse<ClientModel>(error: true, errorMessage: jsonData.body.error);
+        return APIResponse<ClientModel>(error: true, errorMessage: jsonData['message']);
       }
     } catch (err){
       return APIResponse<ClientModel>(error: true, errorMessage: err.toString());
