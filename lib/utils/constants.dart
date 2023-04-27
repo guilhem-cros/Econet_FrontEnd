@@ -7,5 +7,7 @@ class Constants {
   static String ecospotEndpoint = '/ecospot';
   static String typeEndpoint = '/type';
   static String checkEndpoint = '/checkValidity';
+  static String checkAddressEndpoint = '/checkAddress';
+
 
 }

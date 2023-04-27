@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_upload/screens/ecospots/ecospot_form.dart';
 import 'package:image_upload/widgets/custom_buttons/back_button.dart';
 import 'package:image_upload/widgets/lists/ecospots_list.dart';
 
@@ -26,7 +27,11 @@ class EcospotsListScreen extends StatelessWidget{
                 child:Text(title,style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
               ),
                 if(isButtonVisible)
-                  IconButton(onPressed: (){}, icon: const Icon(Icons.add,color: Color.fromRGBO(81, 129, 253, 1),))                
+                  IconButton(onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder:
+                    (context) => EcospotFormScreen()
+                    ));
+                    }, icon: const Icon(Icons.add,color: Color.fromRGBO(81, 129, 253, 1),))
             ],
           ),
           Expanded(child: EcospotsList(ecospotsList: ecospotsList))
