@@ -57,6 +57,9 @@ class _Home extends State<Home>{
               } else {
                 setCurrentClient(snapshot.data!.data!);
                 return Menu();
+                  /*EcospotsListScreen(title: "Mes EcoSpots", isButtonVisible: true, ecospotsList:
+                [EcospotModel(id: '643fd67bae6536d977c1226f', name: "poubelle", address: "bite", details: "oue", tips: "oue", pictureUrl: "https://png.pngtree.com/png-clipart/20220713/ourmid/pngtree-apple-cartoon-png-image_5918123.png", mainType: MainType(id:"43fd551ae6536d977c1225f",name: "type",color: "red",description: "oui",logoUrl: "https://png.pngtree.com/png-clipart/20220713/ourmid/pngtree-apple-cartoon-png-image_5918123.png"), otherTypes: [], isPublished: true),
+                  EcospotModel(id: '643fd67bae6536d977c1226f', name: "tri", address: "oue", details: "oue", tips: "oue", pictureUrl: "https://png.pngtree.com/png-clipart/20220713/ourmid/pngtree-apple-cartoon-png-image_5918123.png", mainType: MainType(id:"43fd551ae6536d977c1225f",name: "nom",color: "red",description: "oui",logoUrl: "https://png.pngtree.com/png-clipart/20220713/ourmid/pngtree-apple-cartoon-png-image_5918123.png"), otherTypes: [], isPublished: true)]);*/
               }
             }else if (snapshot.hasError) {
               return ErrorScreen(errorMessage: snapshot.error.toString());
