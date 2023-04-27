@@ -69,7 +69,39 @@ class ClientDAO {
         return APIResponse<Map<String, dynamic>>(data: data);
       } else {
         // If the server returns an error response
-        return APIResponse<Map<String, dynamic>>(error: true, errorMessage: jsonData.error);
+        return APIResponse<Map<String, dynamic>>(error: true, errorMessage: "Erreur innatendu durant la vérification des données.");
+      }
+    }catch(err){
+      return APIResponse<Map<String, dynamic>>(error: true, errorMessage: err.toString());
+    }
+  }
+
+  /// Check if a specified string doesn't match any existing email or pseudo in the DB
+  /// but the one of the client linked to the specified id
+  /// Return an APIResponse containing the result of the request if no error
+  /// An APIResponse containing an error message if not
+  Future<APIResponse<Map<String, dynamic>>> checkEmailPseudoUniqueForUpdate({
+    required String email,
+    required String pseudo,
+    required String id
+  }) async {
+    final String apiUrl = '${Constants.baseUrl}${Constants.clientEndpoint}${Constants.checkEndpoint}/$id';
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email, 'pseudo': pseudo}),
+      );
+
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 201) {
+        Map<String, dynamic> data = jsonData;
+        // If the server returns a successful response
+        return APIResponse<Map<String, dynamic>>(data: data);
+      } else {
+        // If the server returns an error response
+        return APIResponse<Map<String, dynamic>>(error: true, errorMessage: "Erreur innatendu durant la vérification des données.");
       }
     }catch(err){
       return APIResponse<Map<String, dynamic>>(error: true, errorMessage: err.toString());

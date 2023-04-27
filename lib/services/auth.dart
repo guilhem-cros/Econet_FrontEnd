@@ -10,12 +10,12 @@ class AuthService {
 
   /// Login to an existing firebase account using an email and a password
   /// Return the logged client
-  Future signInEmailPassword(LoginUser _login) async {
+  Future signInEmailPassword(LoginUser login) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-          email: _login.email.toString(),
-          password: _login.password.toString());
+          email: login.email.toString(),
+          password: login.password.toString());
       User? user = userCredential.user;
       return _firebaseUser(user);
     } on FirebaseAuthException catch (e) {
@@ -25,12 +25,12 @@ class AuthService {
 
   /// Register an user into firebase and then use its firbase id to store the client
   /// into the database
-  Future registerEmailPassword(LoginUser _login, String fullName, String pseudo) async {
+  Future registerEmailPassword(LoginUser login, String fullName, String pseudo) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-          email: _login.email.toString(),
-          password: _login.password.toString());
+          email: login.email.toString(),
+          password: login.password.toString());
       User? user = userCredential.user;
 
       // Envoie les données à l'API après la création réussie de l'utilisateur
@@ -38,7 +38,7 @@ class AuthService {
         await clientDAO.createClient(
           fullName: fullName,
           pseudo: pseudo,
-          email: _login.email.toString(),
+          email: login.email.toString(),
           firebaseId: user.uid,
         );
       }
@@ -59,6 +59,34 @@ class AuthService {
     }
     catch(e){
       return null;
+    }
+  }
+
+  /// Connects an user using mail and password and update its email into firebase
+  /// Throws an exception if an error occurs during process
+  Future updateEmail(LoginUser login, String newEmail) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+          email: login.email.toString(),
+          password: login.password.toString());
+      await userCredential.user!.updateEmail(newEmail);
+    } on FirebaseAuthException {
+      throw Exception("Mot de passe invalide");
+    }
+  }
+
+  /// Connects an user using mail and password and update its password into firebase
+  /// Throws an exception if an error occurs during process
+  Future updatePassword(LoginUser login, String newPassword) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+          email: login.email.toString(),
+          password: login.password.toString());
+      await userCredential.user!.updatePassword(newPassword);
+    } on FirebaseAuthException {
+      throw Exception("Mot de passe invalide");
     }
   }
 

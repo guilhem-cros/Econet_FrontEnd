@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_upload/screens/account/update_client_form.dart';
 import 'package:image_upload/widgets/custom_buttons/back_button.dart';
 import 'package:image_upload/widgets/custom_buttons/icon_button.dart';
 
@@ -22,7 +23,11 @@ class MenuAppBar extends StatelessWidget with PreferredSizeWidget{
       elevation: 0,
       leading: const CustomBackButton(),
       actions: [
-        CustomIconButton(onPressed: () {print("todo");}, icon: const Icon(Icons.edit),),
+        CustomIconButton(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const UpdateClientForm()));
+          },
+          icon: const Icon(Icons.edit),),
         const SizedBox(width: 10,),
         CustomIconButton(
           onPressed: () async {

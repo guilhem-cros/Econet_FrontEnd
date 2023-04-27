@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:image_upload/models/api_response.dart';
+import 'package:image_upload/models/client.dart';
 import 'package:image_upload/screens/authenticate/DTOs/loginuser_dto.dart';
 import 'package:image_upload/services/auth.dart';
 import '../../DAOs/client_DAO.dart';
+import '../../screens/home/home.dart';
 
 class RegisterForm extends StatefulWidget {
   final Function? onRegistered;
+  final ClientModel? toUpdateClient;
   final Function? onToggleView;
 
-  const RegisterForm({super.key, this.onRegistered, this.onToggleView});
+  const RegisterForm({super.key, this.onRegistered, this.onToggleView, this.toUpdateClient});
 
   @override
   _RegisterFormState createState() => _RegisterFormState();
@@ -18,12 +22,31 @@ class _RegisterFormState extends State<RegisterForm> {
   final clientDAO = ClientDAO();
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
-  final _email = TextEditingController();
+  bool _updated = false;
+  TextEditingController _email = TextEditingController();
   final _password = TextEditingController();
-  final _full_name = TextEditingController();
-  final _pseudo = TextEditingController();
+  TextEditingController _fullName = TextEditingController();
+  TextEditingController _pseudo = TextEditingController();
+  final TextEditingController _currentPW = TextEditingController();
+
+  bool creation = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    creation = widget.toUpdateClient == null;
+    super.initState();
+    if(!creation){
+      _email = TextEditingController(text: widget.toUpdateClient!.email);
+      _pseudo = TextEditingController(text: widget.toUpdateClient!.pseudo);
+      _fullName = TextEditingController(text: widget.toUpdateClient!.fullName);
+    }
+  }
+
+  void updated(){
+    _updated = true;
+  }
 
   void showPopUp(BuildContext context, String message){
     showDialog(
@@ -38,8 +61,9 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    final full_nameField = TextFormField(
-        controller: _full_name,
+
+    final fullNameField = TextFormField(
+        controller: _fullName,
         autofocus: false,
         validator: (value) {
           if (value == null || value.trim().isEmpty) {
@@ -111,11 +135,11 @@ class _RegisterFormState extends State<RegisterForm> {
         controller: _password,
         autofocus: false,
         validator: (value) {
-          if (value == null || value.trim().isEmpty) {
+          if (creation && (value == null || value.trim().isEmpty)) {
             return 'Ce champ est requis';
           }
-          if (value.trim().length < 8) {
-            return 'Password must be at least 8 characters in length';
+          else if ((!creation && value !=null && value.trim().isNotEmpty && value.trim().length < 8) ||  (creation && value!.trim().length < 8)) {
+            return 'Le mot de passe doit contenir au moins 8 caractères';
           }
           // Return null if the entered password is valid
           return null;
@@ -126,7 +150,7 @@ class _RegisterFormState extends State<RegisterForm> {
             const Icon(
               Icons.lock,
             ),
-            labelText: "Mot de passe",
+            labelText: creation? "Mot de passe" : "Nouveau mot de passe",
             labelStyle: const TextStyle(fontWeight: FontWeight.bold),
             filled: true,
             fillColor: const Color(0x3303d024),
@@ -141,13 +165,14 @@ class _RegisterFormState extends State<RegisterForm> {
 
 
     final confirmPasswordField = TextFormField(
+      controller: creation? null : _currentPW,
       obscureText: _obscureTextConfirm,
       autofocus: false,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
           return 'Ce champ est requis';
         }
-        if (value.trim() != _password.text.trim()) {
+        if (creation && value.trim() != _password.text.trim()) {
           return 'Les mots de passe ne correspondent pas';
         }
         // Return null if the entered password is valid
@@ -158,7 +183,7 @@ class _RegisterFormState extends State<RegisterForm> {
           prefixIcon: const Icon(
             Icons.lock,
           ),
-          labelText: "Confirmer le mot de passe",
+          labelText: creation? "Confirmer le mot de passe" : "Mot de passe actuel",
           labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           filled: true,
           fillColor: const Color(0x3303d024),
@@ -192,30 +217,105 @@ class _RegisterFormState extends State<RegisterForm> {
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(20.0),
         onPressed: () async {
+
           if (_formKey.currentState!.validate()) {
-            final checkResult = await clientDAO.checkEmailPseudoUnique(
+            final checkResult = creation ?
+            await clientDAO.checkEmailPseudoUnique(
               email: _email.text,
               pseudo: _pseudo.text,
+            )
+                :
+            await clientDAO.checkEmailPseudoUniqueForUpdate(
+                email: _email.text,
+                pseudo: _pseudo.text,
+                id: widget.toUpdateClient!.id
             );
-            if(!checkResult.error){
+
+            if (!checkResult.error) {
               if (!checkResult.data!['isUnique']) {
                 showPopUp(context, checkResult.data!['errorMessage']);
-              } else {
-                dynamic result = await _auth.registerEmailPassword(
-                  LoginUser(email: _email.text, password: _password.text),
-                  _full_name.text,
-                  _pseudo.text,
-                );
-                widget.onRegistered!(result);
               }
-            } else{
+              else {
+
+                if (creation) {
+                  try {
+                    dynamic result = await _auth.registerEmailPassword(
+                      LoginUser(email: _email.text, password: _password.text),
+                      _fullName.text,
+                      _pseudo.text,
+                    );
+                    updated();
+                    widget.onRegistered!(result);
+                  } catch (err) {
+                    showPopUp(context, err.toString());
+                    _updated = false;
+                  }
+                }
+
+                else {
+                  dynamic testPW = await _auth.signInEmailPassword(LoginUser(
+                      email: widget.toUpdateClient!.email,
+                      password: _currentPW.text
+                  ));
+                  if (testPW.uid == null) {
+                    showPopUp(context, testPW.code);
+                  } else {
+                    if (_email.text != widget.toUpdateClient!.email) {
+                      try {
+                        await _auth.updateEmail(LoginUser(
+                            email: widget.toUpdateClient!.email,
+                            password: _currentPW.text), _email.text);
+                        Home.currentClient!.email = _email.text;
+                      } catch (err) {
+                        _updated = false;
+                        showPopUp(context, err.toString());
+                      }
+                    }
+                    if (_password.text.isNotEmpty &&
+                        _password.text != _currentPW.text) {
+                      try {
+                        await _auth.updatePassword(LoginUser(
+                            email: widget.toUpdateClient!.email,
+                            password: _currentPW.text), _password.text);
+                      } catch (err) {
+                        _updated = false;
+                        showPopUp(context, err.toString());
+                      }
+                    }
+                    Home.currentClient!.pseudo = _pseudo.text;
+                    Home.currentClient!.fullName = _fullName.text;
+                    APIResponse<ClientModel> result = await clientDAO
+                        .updateClient(
+                        updateClient: Home.currentClient!);
+                    if (result.error) {
+                      _updated = false;
+                      showPopUp(context, result.errorMessage!);
+                    }
+                    else {
+                      updated();
+                    }
+                  }
+                }
+              }
+              }
+
+            else {
               showPopUp(context, checkResult.errorMessage!);
             }
           }
+          if(_updated){
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                    creation ? "Compte créé avec succès !" : "Les modifications ont bien été enregistrées ."),
+              ),
+            );
+            _updated = false;
+          }
         },
-        child: const Text(
-          "Inscription",
-          style: TextStyle(
+        child: Text( creation ?
+          "Inscription" : "Enregistrer",
+          style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
           textAlign: TextAlign.center,
         ),
@@ -243,7 +343,7 @@ class _RegisterFormState extends State<RegisterForm> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          full_nameField,
+                          fullNameField,
                           const SizedBox(height: 25.0),
                           pseudoField,
                           const SizedBox(height: 25.0),
@@ -255,7 +355,7 @@ class _RegisterFormState extends State<RegisterForm> {
                           const SizedBox(height: 25.0),
                           registerButton,
                           const SizedBox(height: 10.0),
-                          txtbutton,
+                          if(creation) txtbutton,
                         ],
                       ),
                     ),
