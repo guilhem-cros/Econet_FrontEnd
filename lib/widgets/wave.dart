@@ -42,6 +42,7 @@ class Wave extends StatelessWidget{
   double? positionTopText;
   double? positionRightText;
   double? positionLeftText;
+  final String label;
   final double height;
   final double p0coeff;
   final double controlPointCoeff;
@@ -57,6 +58,7 @@ class Wave extends StatelessWidget{
     this.positionRightText,
     this.positionLeftText,
     required this.height,
+    required this.label
   });
 
   @override
@@ -81,8 +83,8 @@ class Wave extends StatelessWidget{
                 top: positionTopText, //40 register/70 login
                 left: positionLeftText, //null register/30 login
                 right: positionRightText, //30 register/null login
-                child: const Text('Bienvenue !',
-                    style: TextStyle(
+                child: Text(label,
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 30,
                         color: Colors.white)))

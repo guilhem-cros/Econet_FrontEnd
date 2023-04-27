@@ -4,14 +4,20 @@ class CustomBackButton extends StatelessWidget{
 
   final void Function()? onPressed;
 
-  const CustomBackButton({super.key, required this.onPressed});
+  const CustomBackButton({super.key, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     const color = Color.fromRGBO(81, 129, 253, 1);
 
     return ElevatedButton.icon(
-      onPressed: onPressed,
+      onPressed: () {
+        if(onPressed == null){
+          Navigator.pop(context);
+        } else {
+          onPressed!;
+        }
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,

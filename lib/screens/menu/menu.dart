@@ -2,8 +2,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/client.dart';
+import 'package:image_upload/screens/ecospots_lists/ecospots_list.dart';
 import 'package:image_upload/screens/home/home.dart';
 import 'package:image_upload/screens/menu/menu_app_bar.dart';
+import 'package:image_upload/widgets/wave.dart';
+import 'dart:math' as math;
 
 import '../../DAOs/client_DAO.dart';
 import '../../services/storage_service.dart';
@@ -59,7 +62,7 @@ class MenuState extends State<Menu>{
 
   @override
   Widget build(BuildContext context) {
-
+    
     // set up the buttons
     Widget cancelButton = TextButton(
       child: const Text("Annuler"),
@@ -130,39 +133,63 @@ class MenuState extends State<Menu>{
       return Scaffold(
           appBar: MenuAppBar(),
           body:
-          Column(
-              children: [
-                isLoading ?
-                Center(child:Container(height: 50, width: 50, margin: const EdgeInsets.all(50.0) ,child: const CircularProgressIndicator()))
-                    :
-                ProfilePicDisplay(
-                  profilePicUrl: currentUrl,
-                  onPressed: () async {
-                    final result = await FilePicker.platform.pickFiles(
-                        allowMultiple: false,
-                        type: FileType.custom,
-                        allowedExtensions: ['png', 'jpg', 'jpeg']
-                    );
-                    if(gotError){
-                      showError(context);
+          Stack(
+            children: [
+            Column(
+                children: [
+                  isLoading ?
+                  Center(child:Container(height: 50, width: 50, margin: const EdgeInsets.all(50.0) ,child: const CircularProgressIndicator()))
+                      :
+                  ProfilePicDisplay(
+                    profilePicUrl: currentUrl,
+                    onPressed: () async {
+                      final result = await FilePicker.platform.pickFiles(
+                          allowMultiple: false,
+                          type: FileType.custom,
+                          allowedExtensions: ['png', 'jpg', 'jpeg']
+                      );
+                      if(gotError){
+                        showError(context);
+                      }
+                      if(result != null){
+                        setSelectedFile(result.files.single);
+                        showPopUp(context);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 10,),
+                  Text(Home.currentClient!.pseudo, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+                  const SizedBox(height: 50,),
+                  MenuItem(label: "Ecospots favoris", icon: const Icon(Icons.star), iconColor: const Color.fromRGBO(255, 230, 0, 1),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder:
+                          (context) => EcospotsListScreen(title: 'Ecospots favoris', isButtonVisible: false, ecospotsList: Home.currentClient!.favEcospots)
+                      ));
                     }
-                    if(result != null){
-                      setSelectedFile(result.files.single);
-                      showPopUp(context);
+                  ),
+                  const SizedBox(height: 28,),
+                  MenuItem(label: "Mes Ecospots", icon: const Icon(Icons.pin_drop_outlined), iconColor: const Color.fromRGBO(96, 96, 96, 1),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder:
+                          (context) => EcospotsListScreen(title: 'Mes Ecospots', isButtonVisible: true, ecospotsList: Home.currentClient!.createdEcospots)
+                      ));
                     }
-                  },
-                ),
-                const SizedBox(height: 10,),
-                Text(Home.currentClient!.pseudo, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
-                const SizedBox(height: 50,),
-                const MenuItem(label: "Ecospots favoris", icon: Icon(Icons.star), iconColor: Color.fromRGBO(255, 230, 0, 1),),
-                const SizedBox(height: 25,),
-                const MenuItem(label: "Mes Ecospots", icon: Icon(Icons.pin_drop_outlined), iconColor: Color.fromRGBO(96, 96, 96, 1)),
-                const SizedBox(height: 25,),
-                if(Home.currentClient!.isAdmin)
-                  const MenuItem(label: 'Panel Admin', icon: Icon(Icons.admin_panel_settings_sharp), iconColor: Color.fromRGBO(96, 96, 96, 1))
-              ]
-          )
+                  ),
+                  const SizedBox(height: 28,),
+                  if(Home.currentClient!.isAdmin)
+                    MenuItem(label: 'Panel Admin', icon: const Icon(Icons.admin_panel_settings_sharp), iconColor: const Color.fromRGBO(96, 96, 96, 1),
+                      onTap: (){print('todo');},
+                    ),
+                ]
+            ),
+            Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.rotationX(math.pi),
+              child: Stack(
+                  children: [Wave(0.45, 0.75, 0.65, height: 160 ,positionTop: 0, positionLeft: 0, positionRight: 0, label: "",)])
+            )
+          ]
+        )
       );
     }
   }

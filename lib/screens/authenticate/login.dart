@@ -175,7 +175,7 @@ class _Login extends State<Login> {
             ),
           ),
           Wave(0.75, 0.4, 0.5, positionTop: 0, positionLeft: 0, positionRight: 0,
-              positionTopText: 70, positionLeftText: 30, height: 200),
+              positionTopText: 70, positionLeftText: 30, height: 200, label: "Bienvenue !",),
         ],
       ),
     );
