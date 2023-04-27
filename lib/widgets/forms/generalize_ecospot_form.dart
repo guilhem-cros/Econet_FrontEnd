@@ -1,6 +1,8 @@
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_upload/models/Ecospot.dart';
+import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/widgets/image_picker.dart';
 import '../../DAOs/ecospot_DAO.dart';
 import '../../screens/home/home.dart';
@@ -91,7 +93,7 @@ class _EcospotForm  extends State<EcospotForm>{
         });
       },
       validator: (value) {
-        if (value == null || (value as TypeModel).name.trim().isEmpty) {
+        if (value == null || (value).name.trim().isEmpty) {
           return 'Ce champ est requis';
         }
         return null;
@@ -219,7 +221,7 @@ class _EcospotForm  extends State<EcospotForm>{
         padding: const EdgeInsets.all(20.0),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            final urlPic = await storage.uploadFile(selectedImage!.path!, selectedImage!.name, 'profile_pics');
+            final urlPic = await storage.uploadFile(selectedImage!.path!, selectedImage!.name, 'ecospots');
             final checkResult = await ecospotDAO.checkAddressUnique(
               address: _spotAdress.text,
             );
@@ -227,8 +229,8 @@ class _EcospotForm  extends State<EcospotForm>{
               if (!checkResult.data!['isUnique']) {
                 showPopUp(context, checkResult.data!['errorMessage']);
               } else {
-                dynamic result = await ecospotDAO.createEcospot(name: _spotName.text, address: _spotAdress.text,
-                    details: _spotDetails.text, tips: _spotTips.text, main_type_id: selectedTypeId!, picture_url: urlPic, clientId: Home.currentClient!.id);
+                APIResponse<EcospotModel> result = await ecospotDAO.createEcospot(name: _spotName.text, address: _spotAdress.text,
+                    details: _spotDetails.text, tips: _spotTips.text, mainTypeId: selectedTypeId!, pictureUrl: urlPic, clientId: Home.currentClient!.id);
                 //widget.onRegistered!(result);
               }
             } else{
