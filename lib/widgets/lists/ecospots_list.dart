@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/DAOs/type_DAO.dart';
+import 'package:image_upload/utils/extensions.dart';
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
 import '../ecospot_list_item.dart';
+import 'package:string_to_color/string_to_color.dart';
+
 
 class EcospotsList extends StatefulWidget {
   final List<EcospotModel> ecospotsList;
@@ -123,10 +126,11 @@ class _EcospotsList extends State<EcospotsList> {
                       padding: const EdgeInsets.all(8),
                       itemCount: _copyList!.length,
                       itemBuilder: (context, index) {
+                        print(_copyList![index].mainType.color);
                         return EcospotListItem( spotName: _copyList![index].name,
                             spotType: _copyList![index].mainType.name,
                             imageUrlType: _copyList![index].mainType.logoUrl,
-                            spotColor: Colors.red); //TODO: Les couleurs c'est un merdier
+                            spotColor: _copyList![index].mainType.color.toColor()); //TODO: Les couleurs c'est un merdier
                       },
                     ),
                   ),

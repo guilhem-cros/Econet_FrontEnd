@@ -1,21 +1,25 @@
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:image_upload/models/Ecospot.dart';
+import 'package:image_upload/models/ecospot.dart';
 import 'package:image_upload/models/api_response.dart';
+import 'package:image_upload/utils/extensions.dart';
 import 'package:image_upload/widgets/image_picker.dart';
 import '../../DAOs/ecospot_DAO.dart';
 import '../../screens/home/home.dart';
 import '../../services/storage_service.dart';
 import 'package:collection/collection.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
+
 
 import '../../DAOs/type_DAO.dart';
 import '../../models/type.dart';
 
 class EcospotForm extends StatefulWidget{
   late List<TypeModel>? typeList;
+  final bool isAdmin;
+  final void Function(EcospotModel) onSubmit;
 
-  EcospotForm({super.key});
+  EcospotForm({super.key, required this.isAdmin, required this.onSubmit});
 
   @override
   State<StatefulWidget> createState() {
@@ -31,8 +35,12 @@ class _EcospotForm  extends State<EcospotForm>{
   final _spotDetails = TextEditingController();
   final _spotTips = TextEditingController();
   final _spotOtherTypes = TextEditingController();
+  late bool _isUploading;
   final ecospotDAO = EcospotDAO();
   String? selectedTypeId;
+  List<String> selectedSecondaryTypeIds = [];
+
+
 
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -53,10 +61,28 @@ class _EcospotForm  extends State<EcospotForm>{
     super.initState();
     TypeDAO typeDAO = TypeDAO();
     _typeList = typeDAO.getAll();
+    _isUploading = false;
   }
 
   void setTypeList(List<TypeModel> typeList){
     widget.typeList = typeList;
+  }
+
+  void setUpload(bool isUploading){
+    setState(() {
+      _isUploading = isUploading;
+    });
+  }
+
+  void hasBeenSubmitted(EcospotModel ecospotModel){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: widget.isAdmin? const Text(
+        "EcoSpot publié avec succès !"
+      ): const Text("Votre demande de publication d'EcoSpot a été prise en compte !"))
+    );
+    setUpload(false);
+    Navigator.pop(context);
+    widget.onSubmit(ecospotModel);
   }
 
   PlatformFile? selectedImage;
@@ -83,7 +109,7 @@ class _EcospotForm  extends State<EcospotForm>{
       items: widget.typeList!.map((TypeModel type) {
         return DropdownMenuItem<TypeModel>(
           value: type,
-          child: Text(type.name),
+          child: Text(type.name.toTitleCase()),
         );
       }).toList(),
       onChanged: (TypeModel? newValue) {
@@ -110,6 +136,41 @@ class _EcospotForm  extends State<EcospotForm>{
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(32.0),
               borderSide: BorderSide.none)),
+    );
+  }
+
+  Widget secondaryTypesDropdown() {
+    List<TypeModel> secondaryTypes = widget.typeList!
+        .where((type) => type.id != selectedTypeId)
+        .toList();
+
+    return MultiSelectBottomSheetField(
+      initialChildSize: 0.5,
+      maxChildSize: 0.8,
+      title: const Text("Types secondaires"),
+      buttonIcon: const Icon(Icons.more_horiz),
+      buttonText: const Text("Types secondaires"),
+      cancelText: const Text("Annuler", style:TextStyle(fontWeight: FontWeight.bold)),
+      confirmText: const Text("Valider", style:TextStyle(fontWeight: FontWeight.bold)),
+      items: secondaryTypes.map((type) => MultiSelectItem<String>(type.id, type.name.toTitleCase())).toList(),
+        onConfirm: (values) {
+          setState(() {
+            selectedSecondaryTypeIds = values.map<String>((item) => item.toString()).toList();
+          });
+        },
+      chipDisplay: MultiSelectChipDisplay(
+        chipColor:  const Color(0x9903d024),
+        textStyle: TextStyle(color: Colors.black),
+        onTap: (value) {
+          setState(() {
+            selectedSecondaryTypeIds.remove(value);
+          });
+        },
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32.0),
+        color: const Color(0x3303d024),
+      ),
     );
   }
 
@@ -163,7 +224,7 @@ class _EcospotForm  extends State<EcospotForm>{
 
 
     final detailsField = TextFormField(
-        maxLines: 5,
+        maxLines: 3,
         keyboardType: TextInputType.multiline,
         controller: _spotDetails,
         autofocus: false,
@@ -188,7 +249,7 @@ class _EcospotForm  extends State<EcospotForm>{
 
 
     final tipsField = TextFormField(
-        maxLines: 5,
+        maxLines: 3,
         keyboardType: TextInputType.multiline,
         controller: _spotTips,
         autofocus: false,
@@ -221,29 +282,55 @@ class _EcospotForm  extends State<EcospotForm>{
         padding: const EdgeInsets.all(20.0),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            final urlPic = await storage.uploadFile(selectedImage!.path!, selectedImage!.name, 'ecospots');
-            final checkResult = await ecospotDAO.checkAddressUnique(
-              address: _spotAdress.text,
-            );
-            if(!checkResult.error){
-              if (!checkResult.data!['isUnique']) {
-                showPopUp(context, checkResult.data!['errorMessage']);
-              } else {
-                APIResponse<EcospotModel> result = await ecospotDAO.createEcospot(name: _spotName.text, address: _spotAdress.text,
-                    details: _spotDetails.text, tips: _spotTips.text, mainTypeId: selectedTypeId!, pictureUrl: urlPic, clientId: Home.currentClient!.id);
-                //widget.onRegistered!(result);
+            setUpload(true);
+            if(selectedImage!=null){
+              try{
+                final urlPic = await storage.uploadFile(selectedImage!.path!, selectedImage!.name, 'ecospots');
+                final checkResult = await ecospotDAO.checkAddressUnique(
+                  address: _spotAdress.text,
+                );
+                if(!checkResult.error){
+                  if (!checkResult.data!['isUnique']) {
+                    setUpload(false);
+                    showPopUp(context, checkResult.data!['errorMessage']);
+                  } else {
+                      APIResponse<EcospotModel> result = await ecospotDAO.createEcospot(name: _spotName.text, address: _spotAdress.text,
+                          details: _spotDetails.text, tips: _spotTips.text, mainTypeId: selectedTypeId!, otherTypes: selectedSecondaryTypeIds, pictureUrl: urlPic, clientId: Home.currentClient!.id);
+                      if(result.error){
+                        setUpload(false);
+                        showPopUp(context, result.errorMessage!);
+                      }
+                      else{
+                        hasBeenSubmitted(result.data!);
+                      }
+                  }
+                } else{
+                  setUpload(false);
+                  showPopUp(context, checkResult.errorMessage!);
+                }
               }
-            } else{
-              showPopUp(context, checkResult.errorMessage!);
+              catch(e){
+                setUpload(false);
+               showPopUp(context, e.toString());
+              }
+            }
+            else{
+              setUpload(false);
+              showPopUp(context, "Veuillez sélectionner une image");
             }
           }
         },
-        child: const Text(
+        child: !_isUploading? (!widget.isAdmin ? const Text(
           "Soumettre", //Ou publier si update
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
           textAlign: TextAlign.center,
-        ),
+        ): const Text(
+          "Publier", //Ou publier si update
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+          textAlign: TextAlign.center,
+        )): const SizedBox(height: 20, width: 20, child: CircularProgressIndicator())
       ),
     );
 
@@ -270,6 +357,8 @@ class _EcospotForm  extends State<EcospotForm>{
                                   spotNameField,
                                   const SizedBox(height: 20.0),
                                   spotTypeDropdown(),
+                                  const SizedBox(height: 10.0),
+                                  secondaryTypesDropdown(),
                                   const SizedBox(height: 20.0),
                                   adressField,
                                   const SizedBox(height: 20.0),
@@ -280,6 +369,7 @@ class _EcospotForm  extends State<EcospotForm>{
                                   ImagePicker(label: "Ajouter une image", setSelectedImage: setSelectedImage),
                                   const SizedBox(height: 20.0),
                                   submitButton,
+                                  const SizedBox(height: 20.0),
                                 ]
                             ),
                           ),
