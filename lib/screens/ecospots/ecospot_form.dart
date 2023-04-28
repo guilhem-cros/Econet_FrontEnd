@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/models/ecospot.dart';
 import 'package:image_upload/screens/ecospots_lists/ecospots_list.dart';
-import 'package:image_upload/widgets/forms/generalize_ecospot_form.dart';
 
 import '../../widgets/custom_buttons/back_button.dart';
+import '../forms/generalize_ecospot_form.dart';
 import '../home/home.dart';
 
 class EcospotFormScreen extends StatelessWidget{

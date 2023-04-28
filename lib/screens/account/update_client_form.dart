@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:image_upload/widgets/forms/register_form.dart';
 import 'dart:math' as math;
 
 
 import '../../widgets/custom_buttons/back_button.dart';
 import '../../widgets/wave.dart';
+import '../forms/register_form.dart';
 import '../home/home.dart';
 
 class UpdateClientForm extends StatelessWidget {

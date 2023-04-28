@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/widgets/wave.dart';
-import '../../widgets/forms/register_form.dart';
+
+import '../forms/register_form.dart';
 
 class Register extends StatefulWidget{
 
