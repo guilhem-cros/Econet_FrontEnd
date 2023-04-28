@@ -14,10 +14,10 @@ class EcospotDAO{
     required String address,
     required String details,
     required String tips,
-    required String main_type_id,
-    String? other_types,
+    required String mainTypeId,
+    String? otherTypes,
     bool isPublished = false,
-    required String picture_url,
+    required String pictureUrl,
     required String clientId,
 
   }) async {
@@ -31,10 +31,10 @@ class EcospotDAO{
           'address': address,
           'details': details,
           'tips': tips,
-          'main_type_id': main_type_id,
-          'other_types': other_types,
+          'main_type_id': mainTypeId,
+          'other_types': otherTypes,
           'isPublished': isPublished,
-          'picture_url': picture_url,
+          'picture_url': pictureUrl,
           'clientId': clientId
         }),
         headers: {
@@ -46,7 +46,7 @@ class EcospotDAO{
       if (response.statusCode == 200 || response.statusCode == 201) {
         return APIResponse<EcospotModel>(data: EcospotModel.fromJson(jsonData));
       } else {
-        return APIResponse<EcospotModel>(error: true, errorMessage: jsonData.error);
+        return APIResponse<EcospotModel>(error: true, errorMessage: jsonData['message']);
       }
 
     } catch (err){
@@ -73,7 +73,7 @@ class EcospotDAO{
         return APIResponse<Map<String, dynamic>>(data: data);
       } else {
         // If the server returns an error response
-        return APIResponse<Map<String, dynamic>>(error: true, errorMessage: jsonData.error);
+        return APIResponse<Map<String, dynamic>>(error: true, errorMessage: jsonData['message']);
       }
     }catch(err){
       return APIResponse<Map<String, dynamic>>(error: true, errorMessage: err.toString());
