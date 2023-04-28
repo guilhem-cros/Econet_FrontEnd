@@ -4,7 +4,6 @@ import 'package:image_upload/utils/extensions.dart';
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
 import '../ecospot_list_item.dart';
-import 'package:string_to_color/string_to_color.dart';
 
 
 class EcospotsList extends StatefulWidget {
@@ -122,7 +121,10 @@ class _EcospotsList extends State<EcospotsList> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
+                    child: _copyList!.isEmpty ?
+                    Container(width: 0.9*MediaQuery.of(context).size.width, margin: const EdgeInsets.only(top: 50),
+                        child: const Text("Aucun EcoSpot correspondant à la recherche.", style: TextStyle(fontSize: 16), textAlign: TextAlign.center,)) :
+                    ListView.builder(
                       padding: const EdgeInsets.all(8),
                       itemCount: _copyList!.length,
                       itemBuilder: (context, index) {
@@ -130,8 +132,8 @@ class _EcospotsList extends State<EcospotsList> {
                         return EcospotListItem( spotName: _copyList![index].name,
                             spotType: _copyList![index].mainType.name,
                             imageUrlType: _copyList![index].mainType.logoUrl,
-                            spotColor: _copyList![index].mainType.color.toColor()); //TODO: Les couleurs c'est un merdier
-                      },
+                            spotColor: _copyList![index].mainType.color.toColor());
+                        },
                     ),
                   ),
                 ],
