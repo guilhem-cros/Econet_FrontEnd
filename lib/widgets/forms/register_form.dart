@@ -10,8 +10,9 @@ class RegisterForm extends StatefulWidget {
   final Function? onRegistered;
   final ClientModel? toUpdateClient;
   final Function? onToggleView;
+  final Function? onSubmit;
 
-  const RegisterForm({super.key, this.onRegistered, this.onToggleView, this.toUpdateClient});
+  const RegisterForm({super.key, this.onRegistered, this.onToggleView, this.toUpdateClient, this.onSubmit});
 
   @override
   _RegisterFormState createState() => _RegisterFormState();
@@ -30,6 +31,7 @@ class _RegisterFormState extends State<RegisterForm> {
   final TextEditingController _currentPW = TextEditingController();
 
   bool creation = false;
+  bool isUpdating = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -44,8 +46,29 @@ class _RegisterFormState extends State<RegisterForm> {
     }
   }
 
-  void updated(){
-    _updated = true;
+  void updated(bool state){
+    setState(() {
+      _updated = state;
+    });
+  }
+
+  void submitted(){
+    setState(() {
+      isUpdating = false;
+    });
+    if(_updated){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              creation ? "Compte créé avec succès !" : "Les modifications ont bien été enregistrées ."),
+        ),
+      );
+      if(widget.onSubmit != null){
+        widget.onSubmit!();
+      }
+      Navigator.pop(context);
+      updated(false);
+    }
   }
 
   void showPopUp(BuildContext context, String message){
@@ -218,6 +241,10 @@ class _RegisterFormState extends State<RegisterForm> {
         padding: const EdgeInsets.all(20.0),
         onPressed: () async {
 
+          setState(() {
+            isUpdating = true;
+          });
+
           if (_formKey.currentState!.validate()) {
             final checkResult = creation ?
             await clientDAO.checkEmailPseudoUnique(
@@ -234,6 +261,8 @@ class _RegisterFormState extends State<RegisterForm> {
             if (!checkResult.error) {
               if (!checkResult.data!['isUnique']) {
                 showPopUp(context, checkResult.data!['errorMessage']);
+                updated(false);
+                submitted();
               }
               else {
 
@@ -244,11 +273,13 @@ class _RegisterFormState extends State<RegisterForm> {
                       _fullName.text,
                       _pseudo.text,
                     );
-                    updated();
+                    updated(true);
+                    submitted();
                     widget.onRegistered!(result);
                   } catch (err) {
                     showPopUp(context, err.toString());
-                    _updated = false;
+                    updated(false);
+                    submitted();
                   }
                 }
 
@@ -259,6 +290,8 @@ class _RegisterFormState extends State<RegisterForm> {
                   ));
                   if (testPW.uid == null) {
                     showPopUp(context, testPW.code);
+                    updated(false);
+                    submitted();
                   } else {
                     if (_email.text != widget.toUpdateClient!.email) {
                       try {
@@ -267,8 +300,9 @@ class _RegisterFormState extends State<RegisterForm> {
                             password: _currentPW.text), _email.text);
                         Home.currentClient!.email = _email.text;
                       } catch (err) {
-                        _updated = false;
                         showPopUp(context, err.toString());
+                        updated(false);
+                        submitted();
                       }
                     }
                     if (_password.text.isNotEmpty &&
@@ -278,8 +312,9 @@ class _RegisterFormState extends State<RegisterForm> {
                             email: widget.toUpdateClient!.email,
                             password: _currentPW.text), _password.text);
                       } catch (err) {
-                        _updated = false;
                         showPopUp(context, err.toString());
+                        updated(false);
+                        submitted();
                       }
                     }
                     Home.currentClient!.pseudo = _pseudo.text;
@@ -288,11 +323,13 @@ class _RegisterFormState extends State<RegisterForm> {
                         .updateClient(
                         updateClient: Home.currentClient!);
                     if (result.error) {
-                      _updated = false;
                       showPopUp(context, result.errorMessage!);
+                      updated(false);
+                      submitted();
                     }
                     else {
-                      updated();
+                      updated(true);
+                      submitted();
                     }
                   }
                 }
@@ -301,19 +338,17 @@ class _RegisterFormState extends State<RegisterForm> {
 
             else {
               showPopUp(context, checkResult.errorMessage!);
+              updated(false);
+              submitted();
             }
-          }
-          if(_updated){
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    creation ? "Compte créé avec succès !" : "Les modifications ont bien été enregistrées ."),
-              ),
-            );
-            _updated = false;
+          } else {
+            updated(false);
+            submitted();
           }
         },
-        child: Text( creation ?
+        child: isUpdating ?
+        const SizedBox(height: 20, width: 20 ,child: CircularProgressIndicator()) :
+        Text( creation ?
           "Inscription" : "Enregistrer",
           style: const TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
@@ -331,7 +366,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.only(top: 150),
+              padding: creation? const EdgeInsets.only(top: 150) : const EdgeInsets.only(top: 0),
               child: Column(
                 children: [
                   Form(

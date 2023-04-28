@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/client.dart';
+import 'package:image_upload/screens/admin/admin_menu.dart';
 import 'package:image_upload/screens/ecospots_lists/ecospots_list.dart';
 import 'package:image_upload/screens/home/home.dart';
 import 'package:image_upload/screens/menu/menu_app_bar.dart';
@@ -28,10 +29,23 @@ class Menu extends StatefulWidget {
 class MenuState extends State<Menu>{
 
   PlatformFile? selectedFile;
+  late String pseudo;
   String currentUrl = Home.currentClient!.profilePicUrl;
   bool isLoading = false;
   bool gotError = false;
   bool uploaded = false;
+
+  @override
+  void initState() {
+    pseudo = Home.currentClient!.pseudo;
+    super.initState();
+  }
+
+  void updatePseudo(){
+    setState(() {
+      pseudo = Home.currentClient!.pseudo;
+    });
+  }
 
   void setSelectedFile(PlatformFile newFile){
     setState(() {
@@ -131,7 +145,7 @@ class MenuState extends State<Menu>{
 
 
       return Scaffold(
-          appBar: MenuAppBar(),
+          appBar: MenuAppBar(onSubmit: updatePseudo,),
           body:
           Stack(
             children: [
@@ -160,25 +174,29 @@ class MenuState extends State<Menu>{
                   const SizedBox(height: 10,),
                   Text(Home.currentClient!.pseudo, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
                   const SizedBox(height: 50,),
-                  MenuItem(label: "Ecospots favoris", icon: const Icon(Icons.star), iconColor: const Color.fromRGBO(255, 230, 0, 1),
+                  MenuItem(label: "EcoSpots favoris", icon: const Icon(Icons.star), iconColor: const Color.fromRGBO(255, 230, 0, 1),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder:
-                          (context) => EcospotsListScreen(title: 'Ecospots favoris', isButtonVisible: false, ecospotsList: Home.currentClient!.favEcospots)
+                          (context) => EcospotsListScreen(title: 'EcoSpots Favoris', isButtonVisible: false, ecospotsList: Home.currentClient!.favEcospots)
                       ));
                     }
                   ),
                   const SizedBox(height: 28,),
-                  MenuItem(label: "Mes Ecospots", icon: const Icon(Icons.pin_drop_outlined), iconColor: const Color.fromRGBO(96, 96, 96, 1),
+                  MenuItem(label: "Mes EcoSpots", icon: const Icon(Icons.pin_drop_outlined), iconColor: const Color.fromRGBO(96, 96, 96, 1),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder:
-                          (context) => EcospotsListScreen(title: 'Mes Ecospots', isButtonVisible: true, ecospotsList: Home.currentClient!.createdEcospots)
+                          (context) => EcospotsListScreen(title: 'Mes EcoSpots', isButtonVisible: true, ecospotsList: Home.currentClient!.createdEcospots)
                       ));
                     }
                   ),
                   const SizedBox(height: 28,),
                   if(Home.currentClient!.isAdmin)
                     MenuItem(label: 'Panel Admin', icon: const Icon(Icons.admin_panel_settings_sharp), iconColor: const Color.fromRGBO(96, 96, 96, 1),
-                      onTap: (){print('todo');},
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder:
+                            (context) => const AdminMenu()
+                        ));
+                      },
                     ),
                 ]
             ),

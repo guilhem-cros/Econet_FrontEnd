@@ -17,11 +17,17 @@ class Login extends StatefulWidget {
 
 class _Login extends State<Login> {
   bool _obscureText = true;
+  bool _isLoading = false;
 
   final _email = TextEditingController();
   final _password = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final AuthService _auth = AuthService();
+
+  setLoading(bool loading){
+    _isLoading = loading;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -102,8 +108,9 @@ class _Login extends State<Login> {
         padding: const EdgeInsets.all(20.0),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-
+            setLoading(true);
             dynamic result = await _auth.signInEmailPassword(LoginUser(email: _email.text,password: _password.text));
+            setLoading(false);
             if (result.uid == null) { //null means unsuccessfull authentication
               showDialog(
                   context: context,
@@ -115,7 +122,8 @@ class _Login extends State<Login> {
             }
           }
         },
-        child: const Text(
+        child: _isLoading ? const SizedBox(height: 20, width: 20,child: CircularProgressIndicator(),) :
+        const Text(
           "Connexion",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,
               fontSize: 20),
