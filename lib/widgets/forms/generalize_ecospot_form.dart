@@ -219,20 +219,25 @@ class _EcospotForm  extends State<EcospotForm>{
         padding: const EdgeInsets.all(20.0),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            final urlPic = await storage.uploadFile(selectedImage!.path!, selectedImage!.name, 'profile_pics');
-            final checkResult = await ecospotDAO.checkAddressUnique(
-              address: _spotAdress.text,
-            );
-            if(!checkResult.error){
-              if (!checkResult.data!['isUnique']) {
-                showPopUp(context, checkResult.data!['errorMessage']);
-              } else {
-                dynamic result = await ecospotDAO.createEcospot(name: _spotName.text, address: _spotAdress.text,
-                    details: _spotDetails.text, tips: _spotTips.text, main_type_id: selectedTypeId!, picture_url: urlPic, clientId: Home.currentClient!.id);
-                //widget.onRegistered!(result);
+            if(selectedImage!=null){
+              final urlPic = await storage.uploadFile(selectedImage!.path!, selectedImage!.name, 'profile_pics');
+              final checkResult = await ecospotDAO.checkAddressUnique(
+                address: _spotAdress.text,
+              );
+              if(!checkResult.error){
+                if (!checkResult.data!['isUnique']) {
+                  showPopUp(context, checkResult.data!['errorMessage']);
+                } else {
+                  dynamic result = await ecospotDAO.createEcospot(name: _spotName.text, address: _spotAdress.text,
+                      details: _spotDetails.text, tips: _spotTips.text, main_type_id: selectedTypeId!, picture_url: urlPic, clientId: Home.currentClient!.id);
+                  //widget.onRegistered!(result);
+                }
+              } else{
+                showPopUp(context, checkResult.errorMessage!);
               }
-            } else{
-              showPopUp(context, checkResult.errorMessage!);
+            }
+            else{
+              showPopUp(context, "Veuillez ajouter une image");
             }
           }
         },
@@ -278,6 +283,7 @@ class _EcospotForm  extends State<EcospotForm>{
                                   ImagePicker(label: "Ajouter une image", setSelectedImage: setSelectedImage),
                                   const SizedBox(height: 20.0),
                                   submitButton,
+                                  const SizedBox(height: 20.0),
                                 ]
                             ),
                           ),
