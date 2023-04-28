@@ -13,6 +13,7 @@ class EcospotListItem extends StatelessWidget{
 
   @override
   Widget build(BuildContext context){
+    print(spotColor);
     return Container(
       margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(

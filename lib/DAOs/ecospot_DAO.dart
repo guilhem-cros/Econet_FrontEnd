@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:image_upload/models/Ecospot.dart';
+import 'package:image_upload/models/ecospot.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -15,28 +15,28 @@ class EcospotDAO{
     required String details,
     required String tips,
     required String mainTypeId,
-    String? otherTypes,
+    List<String>? otherTypes,
     bool isPublished = false,
     required String pictureUrl,
     required String clientId,
 
   }) async {
-    final String apiUrl = Constants.baseUrl + Constants.ecospotEndpoint;
-
+    final String apiUrl = '${Constants.baseUrl}${Constants.ecospotEndpoint}/$clientId';
+    otherTypes ??= [];
     try {
+      final body = jsonEncode({
+        'name': name,
+        'address': address,
+        'details': details,
+        'tips': tips,
+        'main_type_id': mainTypeId,
+        'other_types': otherTypes,
+        'isPublished': isPublished,
+        'picture_url': pictureUrl,
+        });
       final response = await http.post(
         Uri.parse(apiUrl),
-        body: jsonEncode({
-          'name': name,
-          'address': address,
-          'details': details,
-          'tips': tips,
-          'main_type_id': mainTypeId,
-          'other_types': otherTypes,
-          'isPublished': isPublished,
-          'picture_url': pictureUrl,
-          'clientId': clientId
-        }),
+        body: body,
         headers: {
           'Content-Type': 'application/json',
         },
