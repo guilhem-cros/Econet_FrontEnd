@@ -7,12 +7,14 @@ import '../../services/auth.dart';
 
 class MenuAppBar extends StatelessWidget with PreferredSizeWidget{
 
+  final void Function() onSubmit;
+
   @override
   final Size preferredSize = const Size.fromHeight(50.0);
 
   final AuthService _auth = AuthService();
 
-  MenuAppBar({super.key});
+  MenuAppBar({super.key, required this.onSubmit});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class MenuAppBar extends StatelessWidget with PreferredSizeWidget{
       actions: [
         CustomIconButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const UpdateClientForm()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateClientForm(onSubmit: onSubmit,)));
           },
           icon: const Icon(Icons.edit),),
         const SizedBox(width: 10,),
