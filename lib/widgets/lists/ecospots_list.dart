@@ -121,7 +121,7 @@ class _EcospotsList extends State<EcospotsList> {
                     ),
                   ),
                   Expanded(
-                    child: _copyList!.isEmpty ?
+                    child: widget.ecospotsList.isEmpty ?
                     Container(width: 0.9*MediaQuery.of(context).size.width, margin: const EdgeInsets.only(top: 50),
                         child: const Text("Aucun EcoSpot correspondant à la recherche.", style: TextStyle(fontSize: 16), textAlign: TextAlign.center,)) :
                     ListView.builder(
