@@ -13,6 +13,7 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import '../../DAOs/type_DAO.dart';
 import '../../models/type.dart';
+import '../error/error_screen.dart';
 
 class EcospotForm extends StatefulWidget{
   late List<TypeModel>? typeList;
@@ -28,13 +29,12 @@ class EcospotForm extends StatefulWidget{
 }
 
 class _EcospotForm  extends State<EcospotForm>{
-  late Future<List<TypeModel>> _typeList;
+  late Future<APIResponse<List<TypeModel>>> _typeList;
   final _spotName = TextEditingController();
   final _spotType = TextEditingController();
   final _spotAdress = TextEditingController();
   final _spotDetails = TextEditingController();
   final _spotTips = TextEditingController();
-  final _spotOtherTypes = TextEditingController();
   late bool _isUploading;
   final ecospotDAO = EcospotDAO();
   String? selectedTypeId;
@@ -336,47 +336,55 @@ class _EcospotForm  extends State<EcospotForm>{
 
     return Scaffold(
         body: Center(
-          child: FutureBuilder<List<TypeModel>>(
+          child: FutureBuilder<APIResponse<List<TypeModel>>>(
               future: _typeList,
               builder: (context,snapshot){
                 if (snapshot.hasData){
-                  setTypeList(snapshot.data!);
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Form(
-                          autovalidateMode: AutovalidateMode.disabled,
-                          key: _formKey,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  const SizedBox(height: 5),
-                                  spotNameField,
-                                  const SizedBox(height: 20.0),
-                                  spotTypeDropdown(),
-                                  const SizedBox(height: 10.0),
-                                  secondaryTypesDropdown(),
-                                  const SizedBox(height: 20.0),
-                                  adressField,
-                                  const SizedBox(height: 20.0),
-                                  detailsField,
-                                  const SizedBox(height: 20.0),
-                                  tipsField,
-                                  const SizedBox(height: 20.0),
-                                  ImagePicker(label: "Ajouter une image", setSelectedImage: setSelectedImage),
-                                  const SizedBox(height: 20.0),
-                                  submitButton,
-                                  const SizedBox(height: 20.0),
-                                ]
+                  if(snapshot.data!.error){
+                    return ErrorScreen(errorMessage: snapshot.data!.errorMessage!);
+                  } else {
+                    setTypeList(snapshot.data!.data!);
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Form(
+                            autovalidateMode: AutovalidateMode.disabled,
+                            key: _formKey,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20.0, right: 20.0),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    const SizedBox(height: 5),
+                                    spotNameField,
+                                    const SizedBox(height: 20.0),
+                                    spotTypeDropdown(),
+                                    const SizedBox(height: 10.0),
+                                    secondaryTypesDropdown(),
+                                    const SizedBox(height: 20.0),
+                                    adressField,
+                                    const SizedBox(height: 20.0),
+                                    detailsField,
+                                    const SizedBox(height: 20.0),
+                                    tipsField,
+                                    const SizedBox(height: 20.0),
+                                    ImagePicker(label: "Ajouter une image",
+                                        setSelectedImage: setSelectedImage),
+                                    const SizedBox(height: 20.0),
+                                    submitButton,
+                                    const SizedBox(height: 20.0),
+                                  ]
+                              ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  );
+                          )
+                        ],
+                      ),
+                    );
+                  }
+                } else if (snapshot.hasError) {
+                  return ErrorScreen(errorMessage: snapshot.error.toString());
                 }
                 return const CircularProgressIndicator();
               }

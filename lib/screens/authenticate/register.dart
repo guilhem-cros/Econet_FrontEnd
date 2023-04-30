@@ -16,29 +16,13 @@ class Register extends StatefulWidget{
 
 class _Register extends State<Register>{
 
-  void showPopUp(BuildContext context, String message){
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Text(message),
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           RegisterForm(
-            onRegistered: (result) {
-              if (result.uid == null) {
-                showPopUp(context, result.toString());
-              }
-            },
             onToggleView: widget.toggleView,
           ),
           Wave(0.25, 0.6, 0.75, positionTop: 0, positionLeft: 0, positionRight: 0,

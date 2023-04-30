@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_upload/screens/admin/type_list.dart';
 import 'package:image_upload/widgets/menu_item.dart';
 import 'dart:math' as math;
 
@@ -54,7 +55,11 @@ class AdminMenu extends StatelessWidget{
               ),
               const SizedBox(height: 28,),
               MenuItem(label: "Types de spot", icon: const Icon(Icons.eco_outlined), iconColor: iconColor,
-                  onTap: (){ print ("types todo");}
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder:
+                    (context) => TypeListScreen()
+                    ));
+                  }
               )
             ],
           ),

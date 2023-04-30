@@ -60,7 +60,7 @@ class _ImagePickerState extends State<ImagePicker>{
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color.fromRGBO(81, 129, 253, 1),
-            minimumSize: const Size(280, 40),
+            minimumSize: Size(0.75*MediaQuery.of(context).size.width, 40),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25.0),
             ),
@@ -71,11 +71,19 @@ class _ImagePickerState extends State<ImagePicker>{
           label: Text(widget.label),
           icon: const Icon(Icons.photo)
         ),
+        const SizedBox(height: 5,),
         if (_imageFile != null)
-          Image.file(
-            _imageFile!,
-            height: 50,
-            width: 50,
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(3),
+              border: Border.all(color: const Color.fromRGBO(81, 129, 253, 1), width: 2)
+            ),
+            child: Image.file(
+              _imageFile!,
+              width: 0.7*MediaQuery.of(context).size.width,
+              height: 140,
+              fit: BoxFit.fitWidth
+            )
           )
       ]
     );

@@ -1,5 +1,3 @@
-import 'package:image_upload/DAOs/client_DAO.dart';
-import 'package:image_upload/models/client.dart';
 import 'package:provider/provider.dart';
 import '../models/firebaseuser.dart';
 import '../screens/home/home.dart';
@@ -24,7 +22,7 @@ class Wrapper extends StatelessWidget{
     }
     else
     {
-      return Home(firebaseId: user!.uid!);
+      return Home(firebaseId: user.uid!);
     }
 
   }

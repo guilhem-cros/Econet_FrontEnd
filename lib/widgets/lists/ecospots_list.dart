@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_upload/DAOs/type_DAO.dart';
 import 'package:image_upload/utils/extensions.dart';
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
@@ -8,9 +7,9 @@ import '../ecospot_list_item.dart';
 
 class EcospotsList extends StatefulWidget {
   final List<EcospotModel> ecospotsList;
-  late List<TypeModel>? typeList;
+  final List<TypeModel> typeList;
 
-  EcospotsList({Key? key, required this.ecospotsList}) : super(key: key);
+  const EcospotsList({Key? key, required this.ecospotsList, required this.typeList}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -20,7 +19,6 @@ class EcospotsList extends StatefulWidget {
 
 class _EcospotsList extends State<EcospotsList> {
   List<EcospotModel>? _copyList;
-  late Future<List<TypeModel>> _typeList;
   final TextEditingController _searchController = TextEditingController();
   List<String> selectedEcospotTypes = [];
 
@@ -28,17 +26,11 @@ class _EcospotsList extends State<EcospotsList> {
   void initState() {
     super.initState();
     _copyList = widget.ecospotsList;
-    TypeDAO typeDAO = TypeDAO();
-    _typeList = typeDAO.getAll();
-  }
-
-  void setTypeList(List<TypeModel> typeList){
-    widget.typeList = typeList;
   }
 
   void _filterList(String query) {
     final List<EcospotModel> filteredList = widget.ecospotsList.where((ecospot) {
-      bool matchesSearch = ecospot.name.contains(query) || ecospot.address.contains(query);
+      bool matchesSearch = ecospot.name.toUpperCase().contains(query.toUpperCase()) || ecospot.address.toUpperCase().contains(query.toUpperCase());
       bool matchesType = selectedEcospotTypes.isEmpty || selectedEcospotTypes.contains(ecospot.mainType.name);
 
       return matchesSearch && matchesType;
@@ -63,7 +55,7 @@ class _EcospotsList extends State<EcospotsList> {
       },
       itemBuilder: (BuildContext context) {
         List<String> ecospotTypes = [];
-        for(TypeModel type in widget.typeList!){
+        for(TypeModel type in widget.typeList){
           ecospotTypes.add(type.name);
         }
 
@@ -88,61 +80,51 @@ class _EcospotsList extends State<EcospotsList> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FutureBuilder<List<TypeModel>>(
-          future: _typeList,
-            builder: (context,snapshot){
-            if (snapshot.hasData){
-              setTypeList(snapshot.data!);
-              return Column(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _searchController,
-                            onChanged: _filterList,
-                            decoration: InputDecoration(
-                              labelText: 'Rechercher',
-                              prefixIcon: const Icon(Icons.search),
-                              filled: true,
-                              fillColor: const Color.fromARGB(255, 238, 238, 238),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  borderSide: BorderSide.none),
-                              contentPadding: const EdgeInsets.all(2),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8.0),
-                        buildFilterMenu(),
-                      ],
-                    ),
-                  ),
                   Expanded(
-                    child: widget.ecospotsList.isEmpty ?
-                    Container(width: 0.9*MediaQuery.of(context).size.width, margin: const EdgeInsets.only(top: 50),
-                        child: const Text("Aucun EcoSpot correspondant à la recherche.", style: TextStyle(fontSize: 16), textAlign: TextAlign.center,)) :
-                    ListView.builder(
-                      padding: const EdgeInsets.all(8),
-                      itemCount: _copyList!.length,
-                      itemBuilder: (context, index) {
-                        print(_copyList![index].mainType.color);
-                        return EcospotListItem( spotName: _copyList![index].name,
-                            spotType: _copyList![index].mainType.name,
-                            imageUrlType: _copyList![index].mainType.logoUrl,
-                            spotColor: _copyList![index].mainType.color.toColor());
-                        },
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: _filterList,
+                      decoration: InputDecoration(
+                        labelText: 'Rechercher',
+                        prefixIcon: const Icon(Icons.search),
+                        filled: true,
+                        fillColor: const Color.fromARGB(255, 238, 238, 238),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide.none),
+                        contentPadding: const EdgeInsets.all(2),
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8.0),
+                  buildFilterMenu(),
                 ],
-              );
-            }
-            return const CircularProgressIndicator();
-          }
-        ),
-      )
+              ),
+            ),
+            Expanded(
+              child: _copyList!.isEmpty ?
+              Container(width: 0.9*MediaQuery.of(context).size.width, margin: const EdgeInsets.only(top: 50),
+                  child: const Text("Aucun EcoSpot correspondant à la recherche.", style: TextStyle(fontSize: 16), textAlign: TextAlign.center,)) :
+              ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: _copyList!.length,
+                itemBuilder: (context, index) {
+                  return EcospotListItem( spotName: _copyList![index].name,
+                      spotType: _copyList![index].mainType.name,
+                      imageUrlType: _copyList![index].mainType.logoUrl,
+                      spotColor: _copyList![index].mainType.color.toColor());
+                  },
+              ),
+            ),
+          ],
+        )
+      ),
     );
   }
 }
