@@ -96,7 +96,7 @@ class _EcospotCardState extends State<EcospotCard> {
             Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.network('https://googleflutter.com/sample_image.jpg',width: 280, height: 150, fit: BoxFit.fitWidth),
+                    Image.network('https://googleflutter.com/sample_image.jpg',width: 0.9*MediaQuery.of(context).size.width, height: 180, fit: BoxFit.fitWidth),
                     ecospotDetails
                   ]
                 ),

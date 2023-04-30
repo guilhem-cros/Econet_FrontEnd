@@ -20,16 +20,25 @@ class Home extends StatefulWidget{
 class _Home extends State<Home>{
 
   late Future<APIResponse<ClientModel>> _clientModel;
+  late int _reloadCount;
+  final ClientDAO clientDAO = ClientDAO();
 
   @override
   void initState() {
     super.initState();
-    ClientDAO clientDAO = ClientDAO();
     _clientModel = clientDAO.getByFirebaseId( uid: widget.firebaseId);
+    _reloadCount = 0;
   }
   
   void setCurrentClient(ClientModel clientModel){
     Home.currentClient = clientModel;
+  }
+
+  void reloadClientModel(){
+    setState(() {
+      _reloadCount++;
+      _clientModel = clientDAO.getByFirebaseId( uid: widget.firebaseId);
+    });
   }
 
   void showPopUp(BuildContext context, String message){
@@ -48,19 +57,20 @@ class _Home extends State<Home>{
 
     return Scaffold(
       body: Center(
-        child: FutureBuilder<APIResponse<ClientModel>>(
+        child: _reloadCount > 3 ?
+        const ErrorScreen(errorMessage: "Délai de chargement dépassé.")
+            :
+        FutureBuilder<APIResponse<ClientModel>>(
           future: _clientModel,
           builder: (context,snapshot){
             if(snapshot.hasData){
               if(snapshot.data!.error){
-                return ErrorScreen(errorMessage: snapshot.data!.errorMessage!);
+                reloadClientModel();
+                return const CircularProgressIndicator();
               } else {
                 setCurrentClient(snapshot.data!.data!);
                 return Menu();
-                  /*EcospotsListScreen(title: "Mes EcoSpots", isButtonVisible: true, ecospotsList:
-                [EcospotModel(id: '643fd67bae6536d977c1226f', name: "poubelle", address: "bite", details: "oue", tips: "oue", pictureUrl: "https://png.pngtree.com/png-clipart/20220713/ourmid/pngtree-apple-cartoon-png-image_5918123.png", mainType: MainType(id:"43fd551ae6536d977c1225f",name: "type",color: "red",description: "oui",logoUrl: "https://png.pngtree.com/png-clipart/20220713/ourmid/pngtree-apple-cartoon-png-image_5918123.png"), otherTypes: [], isPublished: true),
-                  EcospotModel(id: '643fd67bae6536d977c1226f', name: "tri", address: "oue", details: "oue", tips: "oue", pictureUrl: "https://png.pngtree.com/png-clipart/20220713/ourmid/pngtree-apple-cartoon-png-image_5918123.png", mainType: MainType(id:"43fd551ae6536d977c1225f",name: "nom",color: "red",description: "oui",logoUrl: "https://png.pngtree.com/png-clipart/20220713/ourmid/pngtree-apple-cartoon-png-image_5918123.png"), otherTypes: [], isPublished: true)]);*/
-              }
+               }
             }else if (snapshot.hasError) {
               return ErrorScreen(errorMessage: snapshot.error.toString());
             }

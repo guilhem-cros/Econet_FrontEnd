@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_upload/DAOs/client_DAO.dart';
+import 'package:image_upload/models/api_response.dart';
+import 'package:image_upload/models/client.dart';
 import '../models/firebaseuser.dart';
 import '../screens/authenticate/DTOs/loginuser_dto.dart';
 
@@ -35,15 +37,20 @@ class AuthService {
 
       // Envoie les données à l'API après la création réussie de l'utilisateur
       if (user != null) {
-        await clientDAO.createClient(
+        APIResponse<ClientModel> createdCli = await clientDAO.createClient(
           fullName: fullName,
           pseudo: pseudo,
           email: login.email.toString(),
           firebaseId: user.uid,
         );
+
+        if(createdCli.error){
+          return FirebaseUser(code: "Server error", uid: null);
+        } else {
+          return _firebaseUser(user);
+        }
       }
 
-      return _firebaseUser(user);
     } on FirebaseAuthException catch (e) {
       return FirebaseUser(code: e.code, uid: null);
     } catch (e) {

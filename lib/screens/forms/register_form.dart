@@ -7,12 +7,11 @@ import '../../DAOs/client_DAO.dart';
 import '../../screens/home/home.dart';
 
 class RegisterForm extends StatefulWidget {
-  final Function? onRegistered;
   final ClientModel? toUpdateClient;
   final Function? onToggleView;
   final Function? onSubmit;
 
-  const RegisterForm({super.key, this.onRegistered, this.onToggleView, this.toUpdateClient, this.onSubmit});
+  const RegisterForm({super.key, this.onToggleView, this.toUpdateClient, this.onSubmit});
 
   @override
   _RegisterFormState createState() => _RegisterFormState();
@@ -23,7 +22,6 @@ class _RegisterFormState extends State<RegisterForm> {
   final clientDAO = ClientDAO();
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
-  bool _updated = false;
   TextEditingController _email = TextEditingController();
   final _password = TextEditingController();
   TextEditingController _fullName = TextEditingController();
@@ -46,28 +44,29 @@ class _RegisterFormState extends State<RegisterForm> {
     }
   }
 
-  void updated(bool state){
-    setState(() {
-      _updated = state;
-    });
-  }
-
-  void submitted(){
-    setState(() {
-      isUpdating = false;
-    });
-    if(_updated){
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              creation ? "Compte créé avec succès !" : "Les modifications ont bien été enregistrées ."),
-        ),
-      );
+  void submitted(bool updated){
+    if(mounted) {
+      setState(() {
+        isUpdating = false;
+      });
+    }
+    if(updated){
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                creation
+                    ? "Compte créé avec succès !"
+                    : "Les modifications ont bien été enregistrées ."),
+          ),
+        );
+      }
       if(widget.onSubmit != null){
         widget.onSubmit!();
       }
-      Navigator.pop(context);
-      updated(false);
+      if(!creation){
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -261,25 +260,21 @@ class _RegisterFormState extends State<RegisterForm> {
             if (!checkResult.error) {
               if (!checkResult.data!['isUnique']) {
                 showPopUp(context, checkResult.data!['errorMessage']);
-                updated(false);
-                submitted();
+                submitted(false);
               }
               else {
 
                 if (creation) {
                   try {
-                    dynamic result = await _auth.registerEmailPassword(
+                    await _auth.registerEmailPassword(
                       LoginUser(email: _email.text, password: _password.text),
                       _fullName.text,
                       _pseudo.text,
                     );
-                    updated(true);
-                    submitted();
-                    widget.onRegistered!(result);
+                    submitted(true);
                   } catch (err) {
                     showPopUp(context, err.toString());
-                    updated(false);
-                    submitted();
+                    submitted(false);
                   }
                 }
 
@@ -290,8 +285,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   ));
                   if (testPW.uid == null) {
                     showPopUp(context, testPW.code);
-                    updated(false);
-                    submitted();
+                    submitted(false);
                   } else {
                     if (_email.text != widget.toUpdateClient!.email) {
                       try {
@@ -301,8 +295,7 @@ class _RegisterFormState extends State<RegisterForm> {
                         Home.currentClient!.email = _email.text;
                       } catch (err) {
                         showPopUp(context, err.toString());
-                        updated(false);
-                        submitted();
+                        submitted(false);
                       }
                     }
                     if (_password.text.isNotEmpty &&
@@ -313,8 +306,7 @@ class _RegisterFormState extends State<RegisterForm> {
                             password: _currentPW.text), _password.text);
                       } catch (err) {
                         showPopUp(context, err.toString());
-                        updated(false);
-                        submitted();
+                        submitted(false);
                       }
                     }
                     Home.currentClient!.pseudo = _pseudo.text;
@@ -324,12 +316,10 @@ class _RegisterFormState extends State<RegisterForm> {
                         updateClient: Home.currentClient!);
                     if (result.error) {
                       showPopUp(context, result.errorMessage!);
-                      updated(false);
-                      submitted();
+                      submitted(false);
                     }
                     else {
-                      updated(true);
-                      submitted();
+                      submitted(true);
                     }
                   }
                 }
@@ -338,12 +328,10 @@ class _RegisterFormState extends State<RegisterForm> {
 
             else {
               showPopUp(context, checkResult.errorMessage!);
-              updated(false);
-              submitted();
+              submitted(false);
             }
           } else {
-            updated(false);
-            submitted();
+            submitted(false);
           }
         },
         child: isUpdating ?
