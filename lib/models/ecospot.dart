@@ -8,9 +8,9 @@ EcospotModel ecospotModelFromJson(String str) => EcospotModel.fromJson(json.deco
 
 String ecospotModelToJson(EcospotModel data) => json.encode(data.toJson());
 
-List<EcospotModel> typeListFromJson(String str) => List<EcospotModel>.from(json.decode(str).map((x) => EcospotModel.fromJson(x)));
+List<EcospotModel> ecospotListFromJson(String str) => List<EcospotModel>.from(json.decode(str).map((x) => EcospotModel.fromJson(x)));
 
-String typeListToJson(List<EcospotModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String ecospotListToJson(List<EcospotModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class EcospotModel {
   EcospotModel({

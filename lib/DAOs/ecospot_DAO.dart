@@ -79,4 +79,25 @@ class EcospotDAO{
       return APIResponse<Map<String, dynamic>>(error: true, errorMessage: err.toString());
     }
   }
+
+  Future<APIResponse<List<EcospotModel>>> getAllEcoSpots() async{
+    final String apiUrl = Constants.baseUrl + Constants.ecospotEndpoint;
+
+    try {
+      final response = await http.get(
+          Uri.parse(apiUrl));
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 200){
+        return APIResponse<List<EcospotModel>>(data:ecospotListFromJson(response.body));
+      }
+      else {
+        return APIResponse(error: true, errorMessage: jsonData['message']);
+      }
+    } catch(err){
+      return APIResponse(error: true, errorMessage: err.toString());
+    }
+
+  }
 }
+
+
