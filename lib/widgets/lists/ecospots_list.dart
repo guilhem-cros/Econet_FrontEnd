@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_upload/screens/ecospots/ecospot_form.dart';
 import 'package:image_upload/utils/extensions.dart';
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
@@ -39,6 +40,13 @@ class _EcospotsList extends State<EcospotsList> {
     setState(() {
       _copyList = filteredList;
     });
+  }
+
+  //TODO redirect to popup card
+  void tapItem(EcospotModel ecospot){
+    Navigator.push(context, MaterialPageRoute(builder:
+    (context) => EcospotFormScreen(toUpdateEcospot: ecospot)
+    ));
   }
 
   Widget buildFilterMenu() {
@@ -118,7 +126,8 @@ class _EcospotsList extends State<EcospotsList> {
                   return EcospotListItem( spotName: _copyList![index].name,
                       spotType: _copyList![index].mainType.name,
                       imageUrlType: _copyList![index].mainType.logoUrl,
-                      spotColor: _copyList![index].mainType.color.toColor());
+                      spotColor: _copyList![index].mainType.color.toColor(),
+                      onTap: () { tapItem(_copyList![index]); },);
                   },
               ),
             ),

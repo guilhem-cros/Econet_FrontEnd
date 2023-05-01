@@ -16,10 +16,13 @@ class ImagePicker extends StatefulWidget {
   /// The function called after file selection
   final CallBackFunction setSelectedImage;
 
+  final String? currentImageURL;
+
   const ImagePicker({
     super.key,
     required this.label,
-    required this.setSelectedImage
+    required this.setSelectedImage,
+    this.currentImageURL
   });
 
   @override
@@ -72,14 +75,22 @@ class _ImagePickerState extends State<ImagePicker>{
           icon: const Icon(Icons.photo)
         ),
         const SizedBox(height: 5,),
-        if (_imageFile != null)
+        if (_imageFile != null || widget.currentImageURL != null)
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(3),
               border: Border.all(color: const Color.fromRGBO(81, 129, 253, 1), width: 2)
             ),
-            child: Image.file(
+            child: _imageFile!=null ?
+            Image.file(
               _imageFile!,
+              width: 0.7*MediaQuery.of(context).size.width,
+              height: 140,
+              fit: BoxFit.fitWidth
+            )
+                :
+            Image.network(
+              widget.currentImageURL!,
               width: 0.7*MediaQuery.of(context).size.width,
               height: 140,
               fit: BoxFit.fitWidth

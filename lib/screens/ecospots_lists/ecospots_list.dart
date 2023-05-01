@@ -69,7 +69,7 @@ class EcospotsListScreenState extends State<EcospotsListScreen>{
                       if(widget.isButtonVisible)
                         IconButton(onPressed: () {
                           Navigator.push(context, MaterialPageRoute(builder:
-                              (context) => EcospotFormScreen()
+                              (context) => const EcospotFormScreen()
                           ));
                         }, icon: const Icon(
                           Icons.add, color: Color.fromRGBO(81, 129, 253, 1),))

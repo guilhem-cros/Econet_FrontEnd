@@ -98,6 +98,50 @@ class EcospotDAO{
     }
 
   }
+
+  Future<APIResponse<EcospotModel>> updateEcospot({
+    required String id,
+    required String name,
+    required String address,
+    required String details,
+    required String tips,
+    required String mainTypeId,
+    required List<String> otherTypes,
+    required String pictureUrl
+  }) async {
+    final String apiUrl = '${Constants.baseUrl}${Constants.ecospotEndpoint}/${id}';
+
+    try{
+      final body = jsonEncode({
+        'name': name,
+        'address': address,
+        'details': details,
+        'tips': tips,
+        'main_type_id': mainTypeId,
+        'other_types': otherTypes,
+        'picture_url': pictureUrl,
+      });
+
+      final response = await http.put(
+        Uri.parse(apiUrl),
+        body: body,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      );
+
+      final jsonData = json.decode(response.body);
+      if(response.statusCode == 200) {
+        return APIResponse(data: EcospotModel.fromJson(jsonData));
+      } else{
+        return APIResponse(error: true, errorMessage: jsonData['message']);
+      }
+
+    } catch(err) {
+      return APIResponse(error: true, errorMessage: err.toString());
+    }
+
+  }
 }
 
 
