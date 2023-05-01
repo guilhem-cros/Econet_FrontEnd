@@ -56,7 +56,7 @@ class TypeListState extends State<TypeListScreen>{
                   ),
                   IconButton(onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder:
-                        (context) => EcospotFormScreen() //TODO : form creation type
+                        (context) => const EcospotFormScreen() //TODO : form creation type
                     ));
                   }, icon: const Icon(
                     Icons.add, color: Color.fromRGBO(81, 129, 253, 1),))

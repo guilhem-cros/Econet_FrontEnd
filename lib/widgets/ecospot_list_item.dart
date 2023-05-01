@@ -7,14 +7,20 @@ class EcospotListItem extends StatelessWidget{
   final String spotType;
   final String imageUrlType;
   final Color spotColor;
+  final void Function()? onTap;
 
-  const EcospotListItem({super.key, required this.spotName, required this.spotType, required this.imageUrlType, required this.spotColor});
+  const EcospotListItem({super.key, required this.spotName, required this.spotType, required this.imageUrlType, required this.spotColor, this.onTap});
 
 
   @override
   Widget build(BuildContext context){
-    print(spotColor);
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        if (onTap != null){
+          onTap!();
+        }
+      },
+      child: Container(
       margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(
           color: spotColor.withOpacity(0.2),
@@ -41,6 +47,6 @@ class EcospotListItem extends StatelessWidget{
             ],
           )
       ),
-    );
+    ));
   }
 }
