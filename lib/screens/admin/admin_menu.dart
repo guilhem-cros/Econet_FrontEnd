@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_upload/screens/admin/all_ecospots.dart';
 import 'package:image_upload/screens/admin/type_list.dart';
 import 'package:image_upload/widgets/menu_item.dart';
 import 'dart:math' as math;
@@ -47,7 +48,11 @@ class AdminMenu extends StatelessWidget{
                 ),
               const SizedBox(height: 28,),
               MenuItem(label: "Tous les EcoSpots", icon: const Icon(Icons.map_outlined), iconColor: iconColor,
-                  onTap: () {print("List TODO");}
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder:
+                        (context) => AllEcospotsListScreen()
+                    ));
+                  }
               ),
               const SizedBox(height: 28),
               MenuItem(label: "Publications en attente", icon: const Icon(Icons.check_circle_outline), iconColor: iconColor, 
