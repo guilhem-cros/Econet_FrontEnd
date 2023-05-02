@@ -113,7 +113,6 @@ class _EcospotForm  extends State<EcospotForm>{
   void create() async {
     if (selectedImage != null) {
       try {
-        final urlPic = await uploadImage();
         final checkResult = await ecospotDAO.checkAddressUnique(
           address: _spotAdress.text,
         );
@@ -122,6 +121,7 @@ class _EcospotForm  extends State<EcospotForm>{
             setUpload(false);
             showPopUp(context, checkResult.data!['errorMessage']);
           } else {
+            final urlPic = await uploadImage();
             APIResponse<EcospotModel> result = await ecospotDAO.createEcospot(
                 name: _spotName.text,
                 address: _spotAdress.text,
@@ -158,9 +158,6 @@ class _EcospotForm  extends State<EcospotForm>{
   void update() async {
     try{
       bool uploadable = true;
-      if(selectedImage!=null){
-        widget.toUpdateEcospot!.pictureUrl = await uploadImage();
-      }
       if(_spotAdress.text != widget.toUpdateEcospot!.address){
         final checkResult = await ecospotDAO.checkAddressUnique(
           address: _spotAdress.text,
@@ -180,6 +177,9 @@ class _EcospotForm  extends State<EcospotForm>{
       }
 
       if(uploadable){
+        if(selectedImage!=null){
+          widget.toUpdateEcospot!.pictureUrl = await uploadImage();
+        }
         APIResponse<EcospotModel> result = await ecospotDAO.updateEcospot(
             id: widget.toUpdateEcospot!.id,
             name: _spotName.text,
@@ -364,12 +364,6 @@ class _EcospotForm  extends State<EcospotForm>{
         keyboardType: TextInputType.multiline,
         controller: _spotTips,
         autofocus: false,
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            return 'Ce champ est requis';
-          }
-          return null;
-        } ,
         decoration: InputDecoration(
             contentPadding: const EdgeInsets.all(20.0),
             prefixIcon:
@@ -451,8 +445,11 @@ class _EcospotForm  extends State<EcospotForm>{
                                     const SizedBox(height: 20.0),
                                     tipsField,
                                     const SizedBox(height: 20.0),
-                                    ImagePicker(label: "Ajouter une image",
-                                        setSelectedImage: setSelectedImage, currentImageURL: isCreation ? null : widget.toUpdateEcospot!.pictureUrl,),
+                                    ImagePicker(label: "Choisir une image",
+                                      setSelectedImage: setSelectedImage,
+                                      currentImageURL: isCreation ? null : widget.toUpdateEcospot!.pictureUrl,
+                                      previewWidth: 0.7*MediaQuery.of(context).size.width,
+                                    ),
                                     const SizedBox(height: 20.0),
                                     submitButton,
                                     const SizedBox(height: 20.0),

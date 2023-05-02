@@ -43,7 +43,7 @@ class EcospotListItem extends StatelessWidget{
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(spotName.toTitleCase(), style: TextStyle(color: const Color.fromRGBO(45, 45, 45, 1).withOpacity(0.7), fontSize: 20, fontWeight: FontWeight.bold)),
-              Image.network(imageUrlType, height: 30),
+              Image.network(imageUrlType, height: 30, width: 30,),
             ],
           )
       ),

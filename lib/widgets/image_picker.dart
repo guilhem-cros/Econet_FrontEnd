@@ -15,14 +15,18 @@ class ImagePicker extends StatefulWidget {
   final String label;
   /// The function called after file selection
   final CallBackFunction setSelectedImage;
+  double previewHeight;
+  double previewWidth;
 
   final String? currentImageURL;
 
-  const ImagePicker({
+  ImagePicker({
     super.key,
     required this.label,
     required this.setSelectedImage,
-    this.currentImageURL
+    this.currentImageURL,
+    this.previewHeight = 140,
+    this.previewWidth = 140
   });
 
   @override
@@ -84,15 +88,15 @@ class _ImagePickerState extends State<ImagePicker>{
             child: _imageFile!=null ?
             Image.file(
               _imageFile!,
-              width: 0.7*MediaQuery.of(context).size.width,
-              height: 140,
+              width: widget.previewWidth,
+              height: widget.previewHeight,
               fit: BoxFit.fitWidth
             )
                 :
             Image.network(
               widget.currentImageURL!,
-              width: 0.7*MediaQuery.of(context).size.width,
-              height: 140,
+              width: widget.previewWidth,
+              height: widget.previewHeight,
               fit: BoxFit.fitWidth
             )
           )

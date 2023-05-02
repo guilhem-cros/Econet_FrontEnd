@@ -48,6 +48,7 @@ class _EcospotsList extends State<EcospotsList> {
     if (index != -1) {
       toUpdate[index] = updatedEcospot;
     }
+    toUpdate.sort((a, b) => a.name.toUpperCase().compareTo(b.name.toUpperCase()));
   }
 
   //TODO redirect to popup card

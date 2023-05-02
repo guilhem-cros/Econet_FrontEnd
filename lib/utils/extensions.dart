@@ -14,3 +14,9 @@ extension ColorExtension on String {
     return Color(int.parse(buffer.toString(), radix: 16));
   }
 }
+
+extension StringExtension on Color {
+  String toHexString() {
+    return '#${value.toRadixString(16).padLeft(8, '0').substring(2)}';
+  }
+}

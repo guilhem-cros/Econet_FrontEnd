@@ -73,9 +73,11 @@ class EcospotsListScreenState extends State<EcospotsListScreen>{
                               (context) => const EcospotFormScreen()
                           ));
                           if(addedItem!=null) {
-                            widget.ecospotsList.add(addedItem);
+                            int index = widget.ecospotsList.indexWhere((spot) => spot.name.toUpperCase().compareTo(addedItem.name.toUpperCase()) > 0);
+                            index == -1 ? widget.ecospotsList.add(addedItem) : widget.ecospotsList.insert(index, addedItem);
                             setState(() {});
-                            Home.currentClient!.createdEcospots.add(addedItem);
+                            int index2 = Home.currentClient!.createdEcospots.indexWhere((spot) => spot.name.toUpperCase().compareTo(addedItem.name.toUpperCase()) > 0);
+                            index2 == -1 ? Home.currentClient!.createdEcospots.add(addedItem) : Home.currentClient!.createdEcospots.insert(index2, addedItem);
                           }
                         }, icon: const Icon(
                           Icons.add, color: Color.fromRGBO(81, 129, 253, 1),))
