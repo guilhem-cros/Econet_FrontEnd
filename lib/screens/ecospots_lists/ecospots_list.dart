@@ -8,6 +8,7 @@ import 'package:image_upload/widgets/lists/ecospots_list.dart';
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
 import '../error/error_screen.dart';
+import '../home/home.dart';
 
 class EcospotsListScreen extends StatefulWidget{
 
@@ -67,10 +68,15 @@ class EcospotsListScreenState extends State<EcospotsListScreen>{
                             color: Colors.black)),
                       ),
                       if(widget.isButtonVisible)
-                        IconButton(onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder:
+                        IconButton(onPressed: () async {
+                          final addedItem = await Navigator.push<EcospotModel>(context, MaterialPageRoute(builder:
                               (context) => const EcospotFormScreen()
                           ));
+                          if(addedItem!=null) {
+                            widget.ecospotsList.add(addedItem);
+                            setState(() {});
+                            Home.currentClient!.createdEcospots.add(addedItem);
+                          }
                         }, icon: const Icon(
                           Icons.add, color: Color.fromRGBO(81, 129, 253, 1),))
                     ],

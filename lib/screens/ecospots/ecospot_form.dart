@@ -14,19 +14,6 @@ class EcospotFormScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
-    //TODO Refresh lists
-
-    void addEcospotToClient(EcospotModel ecospotModel){
-      Home.currentClient!.createdEcospots.add(ecospotModel);
-    }
-
-    void updateEcospotInList(EcospotModel updatedEcospot, List<EcospotModel> toUpdate){
-      int index = toUpdate.indexWhere((ecospot) => ecospot.id == updatedEcospot.id);
-      if (index != -1) {
-        toUpdate[index] = updatedEcospot;
-      }
-    }
-
     return Scaffold(
       appBar: _AppBar(),
       body: Column(
@@ -41,10 +28,6 @@ class EcospotFormScreen extends StatelessWidget{
           ),
           Expanded(child: EcospotForm(
             isAdmin: Home.currentClient!.isAdmin,
-            onSubmit: toUpdateEcospot==null ? addEcospotToClient : (EcospotModel spot) {
-                updateEcospotInList(spot, Home.currentClient!.createdEcospots);
-                updateEcospotInList(spot, Home.currentClient!.favEcospots);
-              },
             toUpdateEcospot: toUpdateEcospot,
           ))
         ],

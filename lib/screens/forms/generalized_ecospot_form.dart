@@ -19,9 +19,8 @@ class EcospotForm extends StatefulWidget{
   late List<TypeModel>? typeList;
   final bool isAdmin;
   final EcospotModel? toUpdateEcospot;
-  final void Function(EcospotModel) onSubmit;
 
-  EcospotForm({super.key, required this.isAdmin, required this.onSubmit, this.toUpdateEcospot});
+  EcospotForm({super.key, required this.isAdmin, this.toUpdateEcospot});
 
   @override
   State<StatefulWidget> createState() {
@@ -98,8 +97,7 @@ class _EcospotForm  extends State<EcospotForm>{
       ): const Text("Votre demande de publication d'EcoSpot a été prise en compte !"))
     );
     setUpload(false);
-    Navigator.pop(context);
-    widget.onSubmit(ecospotModel);
+    Navigator.pop(context, ecospotModel);
   }
 
   void setSelectedImage(PlatformFile newFile){
