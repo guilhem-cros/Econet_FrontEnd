@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_upload/screens/types/type_form.dart';
 import 'package:image_upload/widgets/lists/type_list.dart';
 
 import '../../DAOs/type_DAO.dart';
 import '../../models/api_response.dart';
 import '../../models/type.dart';
 import '../../widgets/custom_buttons/back_button.dart';
-import '../ecospots/ecospot_form.dart';
 import '../error/error_screen.dart';
 
 class TypeListScreen extends StatefulWidget{
@@ -54,10 +54,15 @@ class TypeListState extends State<TypeListScreen>{
                         fontWeight: FontWeight.bold,
                         color: Colors.black)),
                   ),
-                  IconButton(onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder:
-                        (context) => const EcospotFormScreen() //TODO : form creation type
+                  IconButton(onPressed: () async {
+                    final addedType = await Navigator.push<TypeModel>(context, MaterialPageRoute(builder:
+                        (context) => const TypeFormScreen()
                     ));
+                    if(addedType!=null){
+                      int index = widget.listType.indexWhere((type) => type.name.toUpperCase().compareTo(addedType.name.toUpperCase()) > 0);
+                      index == -1 ? widget.listType.add(addedType) : widget.listType.insert(index, addedType);
+                      setState(() {});
+                    }
                   }, icon: const Icon(
                     Icons.add, color: Color.fromRGBO(81, 129, 253, 1),))
                 ],

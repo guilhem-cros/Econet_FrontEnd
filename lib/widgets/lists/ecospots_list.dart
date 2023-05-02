@@ -3,6 +3,7 @@ import 'package:image_upload/screens/ecospots/ecospot_form.dart';
 import 'package:image_upload/utils/extensions.dart';
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
+import '../../screens/home/home.dart';
 import '../ecospot_list_item.dart';
 
 
@@ -42,11 +43,25 @@ class _EcospotsList extends State<EcospotsList> {
     });
   }
 
+  void updateEcospotInList(EcospotModel updatedEcospot, List<EcospotModel> toUpdate){
+    int index = toUpdate.indexWhere((ecospot) => ecospot.id == updatedEcospot.id);
+    if (index != -1) {
+      toUpdate[index] = updatedEcospot;
+    }
+    toUpdate.sort((a, b) => a.name.toUpperCase().compareTo(b.name.toUpperCase()));
+  }
+
   //TODO redirect to popup card
-  void tapItem(EcospotModel ecospot){
-    Navigator.push(context, MaterialPageRoute(builder:
+  void tapItem(EcospotModel ecospot) async {
+    final updatedItem = await Navigator.push(context, MaterialPageRoute(builder:
     (context) => EcospotFormScreen(toUpdateEcospot: ecospot)
     ));
+    if(updatedItem!=null){
+      updateEcospotInList(updatedItem, widget.ecospotsList);
+      setState(() {});
+      updateEcospotInList(updatedItem, Home.currentClient!.createdEcospots);
+      updateEcospotInList(updatedItem, Home.currentClient!.favEcospots);
+    }
   }
 
   Widget buildFilterMenu() {

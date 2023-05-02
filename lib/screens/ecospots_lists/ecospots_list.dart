@@ -8,6 +8,7 @@ import 'package:image_upload/widgets/lists/ecospots_list.dart';
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
 import '../error/error_screen.dart';
+import '../home/home.dart';
 
 class EcospotsListScreen extends StatefulWidget{
 
@@ -67,10 +68,17 @@ class EcospotsListScreenState extends State<EcospotsListScreen>{
                             color: Colors.black)),
                       ),
                       if(widget.isButtonVisible)
-                        IconButton(onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder:
+                        IconButton(onPressed: () async {
+                          final addedItem = await Navigator.push<EcospotModel>(context, MaterialPageRoute(builder:
                               (context) => const EcospotFormScreen()
                           ));
+                          if(addedItem!=null) {
+                            int index = widget.ecospotsList.indexWhere((spot) => spot.name.toUpperCase().compareTo(addedItem.name.toUpperCase()) > 0);
+                            index == -1 ? widget.ecospotsList.add(addedItem) : widget.ecospotsList.insert(index, addedItem);
+                            setState(() {});
+                            int index2 = Home.currentClient!.createdEcospots.indexWhere((spot) => spot.name.toUpperCase().compareTo(addedItem.name.toUpperCase()) > 0);
+                            index2 == -1 ? Home.currentClient!.createdEcospots.add(addedItem) : Home.currentClient!.createdEcospots.insert(index2, addedItem);
+                          }
                         }, icon: const Icon(
                           Icons.add, color: Color.fromRGBO(81, 129, 253, 1),))
                     ],

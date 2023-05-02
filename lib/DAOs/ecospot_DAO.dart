@@ -23,6 +23,7 @@ class EcospotDAO{
   }) async {
     final String apiUrl = '${Constants.baseUrl}${Constants.ecospotEndpoint}/$clientId';
     otherTypes ??= [];
+    if(tips.isEmpty){ tips = " ";}
     try {
       final body = jsonEncode({
         'name': name,
@@ -109,6 +110,7 @@ class EcospotDAO{
     required List<String> otherTypes,
     required String pictureUrl
   }) async {
+    if(tips.isEmpty){ tips = " ";}
     final String apiUrl = '${Constants.baseUrl}${Constants.ecospotEndpoint}/${id}';
 
     try{
