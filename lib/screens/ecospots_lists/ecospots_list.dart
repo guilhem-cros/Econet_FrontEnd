@@ -14,11 +14,12 @@ class EcospotsListScreen extends StatefulWidget{
 
   final String title;
   final bool isButtonVisible;
+  final bool isPublicationList;
   final List<EcospotModel> ecospotsList;
   late List<TypeModel> listType ;
 
 
-  EcospotsListScreen({super.key, required this.title, required this.isButtonVisible, required this.ecospotsList});
+  EcospotsListScreen({super.key, required this.title, required this.isButtonVisible, required this.ecospotsList, this.isPublicationList = false});
 
   @override
   State<StatefulWidget> createState() {
@@ -70,14 +71,16 @@ class EcospotsListScreenState extends State<EcospotsListScreen>{
                       if(widget.isButtonVisible)
                         IconButton(onPressed: () async {
                           final addedItem = await Navigator.push<EcospotModel>(context, MaterialPageRoute(builder:
-                              (context) => const EcospotFormScreen()
+                              (context) => EcospotFormScreen(isPublicationForm: widget.isPublicationList,)
                           ));
                           if(addedItem!=null) {
                             int index = widget.ecospotsList.indexWhere((spot) => spot.name.toUpperCase().compareTo(addedItem.name.toUpperCase()) > 0);
                             index == -1 ? widget.ecospotsList.add(addedItem) : widget.ecospotsList.insert(index, addedItem);
                             setState(() {});
-                            int index2 = Home.currentClient!.createdEcospots.indexWhere((spot) => spot.name.toUpperCase().compareTo(addedItem.name.toUpperCase()) > 0);
-                            index2 == -1 ? Home.currentClient!.createdEcospots.add(addedItem) : Home.currentClient!.createdEcospots.insert(index2, addedItem);
+                            if(widget.title != 'Mes EcoSpots'){
+                              int index2 = Home.currentClient!.createdEcospots.indexWhere((spot) => spot.name.toUpperCase().compareTo(addedItem.name.toUpperCase()) > 0);
+                              index2 == -1 ? Home.currentClient!.createdEcospots.add(addedItem) : Home.currentClient!.createdEcospots.insert(index2, addedItem);
+                            }
                           }
                         }, icon: const Icon(
                           Icons.add, color: Color.fromRGBO(81, 129, 253, 1),))
@@ -85,7 +88,9 @@ class EcospotsListScreenState extends State<EcospotsListScreen>{
                   ),
                   Expanded(child: EcospotsList(
                     ecospotsList: widget.ecospotsList,
-                    typeList: widget.listType,))
+                    typeList: widget.listType,
+                    isPublicationList: widget.isPublicationList,
+                  ))
                 ],
               );
             }

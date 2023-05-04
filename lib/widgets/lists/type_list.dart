@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_upload/screens/types/type_form.dart';
 import 'package:image_upload/utils/extensions.dart';
 import 'package:image_upload/widgets/type_list_item.dart';
 
@@ -28,6 +29,15 @@ class TypeListState extends State<TypeList> {
     super.initState();
   }
 
+  void updateList(TypeModel updatedType){
+    int index = widget.typeList.indexWhere((type) => type.id == updatedType.id);
+    if(index != -1){
+      widget.typeList[index] = updatedType;
+    }
+    widget.typeList.sort((a,b) => a.name.toUpperCase().compareTo(b.name.toUpperCase()));
+    setState(() {});
+  }
+
   void _filterList(String query){
     final List<TypeModel> filteredList = widget.typeList.where((type){
       return type.name.toUpperCase().contains(query.toUpperCase()) || type.description.toUpperCase().contains(query.toUpperCase());
@@ -36,6 +46,15 @@ class TypeListState extends State<TypeList> {
     setState(() {
       _copyList = filteredList;
     });
+  }
+
+  void tapItem(TypeModel type) async {
+    final updatedItem = await Navigator.push(context, MaterialPageRoute(builder:
+    (context) => TypeFormScreen(toUpdateType: type,)
+    ));
+    if(updatedItem!=null){
+      updateList(updatedItem);
+    }
   }
 
   @override
@@ -76,6 +95,7 @@ class TypeListState extends State<TypeList> {
                       typeName: _copyList[index].name,
                       typeColor: _copyList[index].color.toColor(),
                       typeLogoUrl: _copyList[index].logoUrl,
+                      onTap: (){tapItem(_copyList[index]);},
                   );
                 },
             )
