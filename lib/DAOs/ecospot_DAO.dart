@@ -100,6 +100,25 @@ class EcospotDAO{
 
   }
 
+  Future<APIResponse<List<EcospotModel>>> getUnpublishedEcoSpots() async{
+    final String apiUrl = Constants.baseUrl + Constants.ecospotEndpoint + Constants.unpublishedEndpoint;
+
+    try {
+      final response = await http.get(
+          Uri.parse(apiUrl));
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 200){
+        return APIResponse<List<EcospotModel>>(data:ecospotListFromJson(response.body));
+      }
+      else {
+        return APIResponse(error: true, errorMessage: jsonData['message']);
+      }
+    } catch(err){
+      return APIResponse(error: true, errorMessage: err.toString());
+    }
+
+  }
+
   Future<APIResponse<EcospotModel>> updateEcospot({
     required String id,
     required String name,
