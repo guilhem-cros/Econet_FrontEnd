@@ -1,8 +1,11 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:image_upload/DAOs/client_DAO.dart';
 import 'package:image_upload/models/api_response.dart';
+import 'package:image_upload/models/client.dart';
 import 'package:image_upload/models/type.dart';
+import 'package:image_upload/screens/home/home.dart';
 import 'package:image_upload/services/storage_service.dart';
 import 'package:image_upload/utils/extensions.dart';
 
@@ -71,7 +74,14 @@ class _TypeFormState extends State<TypeForm>{
     });
   }
 
-  void hasBeenSumitted(TypeModel type){
+  void hasBeenSumitted(TypeModel type) async {
+    if(!isCreation){
+      ClientDAO clientDAO = ClientDAO();
+      APIResponse<ClientModel> reloadedClient = await clientDAO.getById(id: Home.currentClient!.id);
+      if(!reloadedClient.error){
+        Home.currentClient = reloadedClient.data;
+      }
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(isCreation ? "Type publié avec succès" : "Type mis à jour avec succès"))
     );
@@ -138,8 +148,46 @@ class _TypeFormState extends State<TypeForm>{
   }
 
   /// Handling type update
-  void update(){
-    //TODO
+  void update() async {
+    try{
+      final isUniqueResult = await typeDAO.isTypeUnique(
+          name: _typeName.text,
+          color: selectedColor!.toHexString(),
+          typeId: widget.toUpdateType!.id
+      );
+      if(isUniqueResult.error){
+        setUpload(false);
+        showPopUp(context, isUniqueResult.errorMessage!);
+      } else {
+        if (!isUniqueResult.data!) {
+          setUpload(false);
+          showPopUp(context,
+              "Le nom ou la couleur saisie est déjà associé à un type.");
+        } else {
+          if(selectedImage!=null){
+            widget.toUpdateType!.logoUrl = await uploadImage();
+          }
+          APIResponse<TypeModel> result = await typeDAO.update(
+              id: widget.toUpdateType!.id,
+              name: _typeName.text,
+              logoUrl: widget.toUpdateType!.logoUrl,
+              color: selectedColor!.toHexString(),
+              description: _typeDescription.text,
+              associatedSpots: widget.toUpdateType!.associatedSpots
+          );
+          if(result.error){
+            setUpload(false);
+            showPopUp(context, result.errorMessage!);
+          } else {
+            hasBeenSumitted(result.data!);
+          }
+        }
+      }
+
+    } catch (err) {
+      setUpload(false);
+      showPopUp(context, err.toString());
+    }
   }
 
   @override
@@ -204,7 +252,7 @@ class _TypeFormState extends State<TypeForm>{
       ),
       ),
       actions: <Widget>[
-        ElevatedButton(
+       TextButton(
           child: const Text('OK'),
           onPressed: () {
             Navigator.of(context).pop();

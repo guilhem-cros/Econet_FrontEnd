@@ -92,4 +92,44 @@ class TypeDAO{
       return APIResponse(error: true, errorMessage: err.toString());
     }
   }
+
+  /// Updates a type by its id into the DB
+  /// Return the updated type in an APIResponse
+  /// Return an error message in an APIResponse if an error occurs during operation
+  Future<APIResponse<TypeModel>> update({
+    required String id,
+    required String name,
+    required String logoUrl,
+    required String color,
+    required String description,
+    List<String> associatedSpots = const []
+  }) async {
+    final String apiUrl = '${Constants.baseUrl}${Constants.typeEndpoint}/$id';
+
+    try{
+      final body = jsonEncode({
+        'name': name,
+        'color': color,
+        'description': description,
+        'logo_url': logoUrl,
+        'associated_spots': associatedSpots
+      });
+      final response = await http.put(
+        Uri.parse(apiUrl),
+        body: body,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      );
+
+      final jsonData = json.decode(response.body);
+      if(response.statusCode == 200){
+        return APIResponse(data: TypeModel.fromJson(jsonData));
+      } else {
+        return APIResponse(error: true, errorMessage: jsonData['message']);
+      }
+    } catch (err) {
+      return APIResponse(error: true, errorMessage: err.toString());
+    }
+  }
 }

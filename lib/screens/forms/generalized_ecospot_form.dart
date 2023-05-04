@@ -130,6 +130,7 @@ class _EcospotForm  extends State<EcospotForm>{
                 mainTypeId: selectedTypeId!,
                 otherTypes: selectedSecondaryTypeIds,
                 pictureUrl: urlPic,
+                isPublished: Home.currentClient!.isAdmin,
                 clientId: Home.currentClient!.id);
             if (result.error) {
               setUpload(false);
@@ -188,7 +189,8 @@ class _EcospotForm  extends State<EcospotForm>{
             tips: _spotTips.text,
             mainTypeId: selectedTypeId!,
             otherTypes: selectedSecondaryTypeIds,
-            pictureUrl: widget.toUpdateEcospot!.pictureUrl
+            pictureUrl: widget.toUpdateEcospot!.pictureUrl,
+            isPublished: Home.currentClient!.isAdmin
         );
         if(result.error){
           setUpload(false);

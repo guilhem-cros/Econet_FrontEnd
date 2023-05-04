@@ -10,8 +10,9 @@ import '../ecospot_list_item.dart';
 class EcospotsList extends StatefulWidget {
   final List<EcospotModel> ecospotsList;
   final List<TypeModel> typeList;
+  final bool isPublicationList;
 
-  const EcospotsList({Key? key, required this.ecospotsList, required this.typeList}) : super(key: key);
+  const EcospotsList({Key? key, required this.ecospotsList, required this.typeList, this.isPublicationList = false}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -51,16 +52,32 @@ class _EcospotsList extends State<EcospotsList> {
     toUpdate.sort((a, b) => a.name.toUpperCase().compareTo(b.name.toUpperCase()));
   }
 
-  //TODO redirect to popup card
+
   void tapItem(EcospotModel ecospot) async {
-    final updatedItem = await Navigator.push(context, MaterialPageRoute(builder:
-    (context) => EcospotFormScreen(toUpdateEcospot: ecospot)
-    ));
-    if(updatedItem!=null){
-      updateEcospotInList(updatedItem, widget.ecospotsList);
+    if(widget.isPublicationList){
+      final toRemoveItem = await Navigator.push(context, MaterialPageRoute(builder:
+      (context) => EcospotFormScreen(toUpdateEcospot: ecospot, isPublicationForm: true)
+      ));
+      if(toRemoveItem == null ){
+        int index = widget.ecospotsList.indexWhere((spot) => spot.id == ecospot.id);
+        widget.ecospotsList.removeAt(index);
+      } else {
+        int index = widget.ecospotsList.indexWhere((spot) => spot.id == toRemoveItem.id);
+        widget.ecospotsList.removeAt(index);
+      }
       setState(() {});
-      updateEcospotInList(updatedItem, Home.currentClient!.createdEcospots);
-      updateEcospotInList(updatedItem, Home.currentClient!.favEcospots);
+    }
+
+    else { //TODO redirect to popup card
+      final updatedItem = await Navigator.push(context, MaterialPageRoute(builder:
+      (context) => EcospotFormScreen(toUpdateEcospot: ecospot)
+      ));
+      if(updatedItem!=null){
+        updateEcospotInList(updatedItem, widget.ecospotsList);
+        setState(() {});
+        updateEcospotInList(updatedItem, Home.currentClient!.createdEcospots);
+        updateEcospotInList(updatedItem, Home.currentClient!.favEcospots);
+      }
     }
   }
 

@@ -4,8 +4,6 @@ import 'package:image_upload/DAOs/ecospot_DAO.dart';
 import 'package:image_upload/models/ecospot.dart';
 
 import '../../models/api_response.dart';
-import '../../models/type.dart';
-import '../../widgets/custom_buttons/back_button.dart';
 import '../ecospots_lists/ecospots_list.dart';
 import '../error/error_screen.dart';
 
@@ -52,7 +50,10 @@ class UnpublishedEcospotListState extends State<UnpublishedEcospotListScreen>{
                         return Expanded( child: EcospotsListScreen(
                             title: "Publications en attente",
                             isButtonVisible: false,
-                            ecospotsList: widget.listUnpublishedEcospot));
+                            ecospotsList: widget.listUnpublishedEcospot,
+                            isPublicationList: true,
+                          ),
+                        );
                       }
                     } else if (snapshot.hasError) {
                       return ErrorScreen(errorMessage: snapshot.error.toString());
@@ -67,21 +68,4 @@ class UnpublishedEcospotListState extends State<UnpublishedEcospotListScreen>{
     );
   }
 
-}
-
-class _AppBar extends StatelessWidget with PreferredSizeWidget {
-  @override
-  final Size preferredSize = const Size.fromHeight(50.0);
-
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      shadowColor: Colors.transparent,
-      leading: const CustomBackButton(),
-      leadingWidth: 110,
-    );
-  }
 }

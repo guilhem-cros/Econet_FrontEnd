@@ -131,6 +131,28 @@ class ClientDAO {
     }
   }
 
+  /// Get a client by its id from the DB
+  /// Return an APIResponse of a clientModel containing the matched client if the request worked
+  /// An APIResponse containing an error message if not
+  Future<APIResponse<ClientModel>> getById({required String id}) async{
+    final String apiUrl = '${Constants.baseUrl}${Constants.clientEndpoint}/$id';
+
+    try {
+      final response = await http.get(
+          Uri.parse(apiUrl));
+
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
+      }
+      else {
+        return APIResponse<ClientModel>(error: true, errorMessage: jsonData['message']);
+      }
+    } catch(err){
+      return APIResponse<ClientModel>(error: true, errorMessage: err.toString());
+    }
+  }
+
 
   /// Update the specified client in the database
   /// Return an APIResponse containing the just updated client if request worked

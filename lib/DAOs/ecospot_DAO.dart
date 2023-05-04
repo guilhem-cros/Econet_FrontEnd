@@ -127,7 +127,8 @@ class EcospotDAO{
     required String tips,
     required String mainTypeId,
     required List<String> otherTypes,
-    required String pictureUrl
+    required String pictureUrl,
+    bool isPublished = false
   }) async {
     if(tips.isEmpty){ tips = " ";}
     final String apiUrl = '${Constants.baseUrl}${Constants.ecospotEndpoint}/${id}';
@@ -141,6 +142,7 @@ class EcospotDAO{
         'main_type_id': mainTypeId,
         'other_types': otherTypes,
         'picture_url': pictureUrl,
+        'isPublished': isPublished
       });
 
       final response = await http.put(
@@ -163,6 +165,35 @@ class EcospotDAO{
     }
 
   }
+
+
+  /// Delete an ecospot from the DB by using its id
+  /// Return the deleted spot in an APIResponse object
+  /// Return an error in an APIResponse if an exception occured during operation
+  Future<APIResponse<EcospotModel>> delete ({
+    required String id
+  }) async {
+    final String apiUrl = '${Constants.baseUrl}${Constants.ecospotEndpoint}/${id}';
+
+    try {
+      final response = await http.delete(
+        Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+          }
+      );
+
+      final jsonData = json.decode(response.body);
+      if(response.statusCode == 200 || response.statusCode == 202 ||response.statusCode == 204) {
+        return APIResponse(data: EcospotModel.fromJson(jsonData));
+      } else{
+        return APIResponse(error: true, errorMessage: jsonData['message']);
+      }
+
+    } catch (err) {
+      return APIResponse(error: true, errorMessage: err.toString());
+    }
+}
 }
 
 
