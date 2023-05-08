@@ -8,7 +8,6 @@ import '../screens/authenticate/DTOs/loginuser_dto.dart';
 /// Class handling authentication via firebase
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final clientDAO = ClientDAO();
 
   /// Login to an existing firebase account using an email and a password
   /// Return the logged client
@@ -29,6 +28,7 @@ class AuthService {
   /// into the database
   Future registerEmailPassword(LoginUser login, String fullName, String pseudo) async {
     try {
+      final clientDAO = ClientDAO();
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
           email: login.email.toString(),
@@ -104,6 +104,17 @@ class AuthService {
     try {
       return await _auth.signOut();
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<String?> getUserToken() async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      String? token = await user.getIdToken();
+      return token;
+    } else {
       return null;
     }
   }

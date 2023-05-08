@@ -6,6 +6,7 @@ class Constants {
   static String firebaseEndpoint = '/byFirebaseId/';
   static String ecospotEndpoint = '/ecospot';
   static String unpublishedEndpoint = '/unpublished/ecospots';
+  static String publishedEndpoint = '/published/ecospots';
   static String typeEndpoint = '/type';
   static String checkEndpoint = '/checkValidity';
   static String checkAddressEndpoint = '/check/address';

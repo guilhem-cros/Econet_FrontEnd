@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:image_upload/models/api_response.dart';
+import 'package:image_upload/services/auth.dart';
 import 'package:image_upload/utils/constants.dart';
 import '../models/client.dart';
 
 /// DAO used to get client objects from the DB
 class ClientDAO {
+
+  final AuthService _auth = AuthService();
 
   /// Create a client in the DB
   /// Need the full_name, the pseudo, the email and the firebaseId of the client
@@ -115,9 +118,17 @@ class ClientDAO {
   Future<APIResponse<ClientModel>> getByFirebaseId({required String uid}) async{
     final String apiUrl = Constants.baseUrl + Constants.clientEndpoint + Constants.firebaseEndpoint + uid;
 
+
     try {
+      String? token = await _auth.getUserToken();
+
       final response = await http.get(
-          Uri.parse(apiUrl));
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
 
       final jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -138,8 +149,16 @@ class ClientDAO {
     final String apiUrl = '${Constants.baseUrl}${Constants.clientEndpoint}/$id';
 
     try {
+
+      String? token = await _auth.getUserToken();
+
       final response = await http.get(
-          Uri.parse(apiUrl));
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
 
       final jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -163,11 +182,15 @@ class ClientDAO {
     final String apiUrl = '${Constants.baseUrl}${Constants.clientEndpoint}/${updateClient.id}';
 
     try {
+
+      String? token = await _auth.getUserToken();
+
       final response = await http.put(
         Uri.parse(apiUrl),
         body: jsonEncode(updateClient.toJson()),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
         },
       );
 
