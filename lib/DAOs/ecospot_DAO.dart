@@ -5,9 +5,12 @@ import 'package:http/http.dart' as http;
 
 
 import '../models/api_response.dart';
+import '../services/auth.dart';
 import '../utils/constants.dart';
 
 class EcospotDAO{
+
+  final AuthService _auth = AuthService();
 
   Future<APIResponse<EcospotModel>> createEcospot({
     required String name,
@@ -25,6 +28,9 @@ class EcospotDAO{
     otherTypes ??= [];
     if(tips.isEmpty){ tips = " ";}
     try {
+
+      String? token = await _auth.getUserToken();
+
       final body = jsonEncode({
         'name': name,
         'address': address,
@@ -40,6 +46,7 @@ class EcospotDAO{
         body: body,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
         },
       );
 
@@ -85,8 +92,16 @@ class EcospotDAO{
     final String apiUrl = Constants.baseUrl + Constants.ecospotEndpoint;
 
     try {
+
+      String? token = await _auth.getUserToken();
+
       final response = await http.get(
-          Uri.parse(apiUrl));
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
       final jsonData = json.decode(response.body);
       if (response.statusCode == 200){
         return APIResponse<List<EcospotModel>>(data:ecospotListFromJson(response.body));
@@ -104,8 +119,43 @@ class EcospotDAO{
     final String apiUrl = Constants.baseUrl + Constants.ecospotEndpoint + Constants.unpublishedEndpoint;
 
     try {
+
+      String? token = await _auth.getUserToken();
+
       final response = await http.get(
-          Uri.parse(apiUrl));
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 200){
+        return APIResponse<List<EcospotModel>>(data:ecospotListFromJson(response.body));
+      }
+      else {
+        return APIResponse(error: true, errorMessage: jsonData['message']);
+      }
+    } catch(err){
+      return APIResponse(error: true, errorMessage: err.toString());
+    }
+
+  }
+
+  Future<APIResponse<List<EcospotModel>>> getPublishedEcoSpots() async{
+    final String apiUrl = Constants.baseUrl + Constants.ecospotEndpoint + Constants.publishedEndpoint;
+
+    try {
+
+      String? token = await _auth.getUserToken();
+
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
       final jsonData = json.decode(response.body);
       if (response.statusCode == 200){
         return APIResponse<List<EcospotModel>>(data:ecospotListFromJson(response.body));
@@ -134,6 +184,9 @@ class EcospotDAO{
     final String apiUrl = '${Constants.baseUrl}${Constants.ecospotEndpoint}/${id}';
 
     try{
+
+      String? token = await _auth.getUserToken();
+
       final body = jsonEncode({
         'name': name,
         'address': address,
@@ -150,7 +203,8 @@ class EcospotDAO{
         body: body,
         headers: {
           'Content-Type': 'application/json',
-        }
+          'Authorization': 'Bearer $token'
+        },
       );
 
       final jsonData = json.decode(response.body);
@@ -176,11 +230,15 @@ class EcospotDAO{
     final String apiUrl = '${Constants.baseUrl}${Constants.ecospotEndpoint}/${id}';
 
     try {
+
+      String? token = await _auth.getUserToken();
+
       final response = await http.delete(
         Uri.parse(apiUrl),
-          headers: {
-            'Content-Type': 'application/json',
-          }
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
       );
 
       final jsonData = json.decode(response.body);

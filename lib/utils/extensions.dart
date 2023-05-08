@@ -20,3 +20,9 @@ extension StringExtension on Color {
     return '#${value.toRadixString(16).padLeft(8, '0').substring(2)}';
   }
 }
+
+extension LocationExtension on String {
+  toLocation() {
+
+  }
+}

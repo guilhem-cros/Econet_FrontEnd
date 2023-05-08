@@ -12,8 +12,8 @@ class ErrorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      body: Column(
+    return Expanded(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline, color: Colors.red, size: 60,),
@@ -22,7 +22,7 @@ class ErrorScreen extends StatelessWidget {
           const SizedBox(height: 10),
           const Text("Veuillez redémarrer l'application. Si l'erreur persiste, contactez le support.",textAlign: TextAlign.center,),
         ],
-      ),
+      )
     );
   }
 

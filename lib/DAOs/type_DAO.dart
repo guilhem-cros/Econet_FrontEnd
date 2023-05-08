@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/type.dart';
 import 'package:http/http.dart' as http;
+import '../services/auth.dart';
 import '../utils/constants.dart';
 
 /// Get all existing types from the DB
@@ -10,12 +11,22 @@ import '../utils/constants.dart';
 /// AN APIResponse containing an error if the request didn't work
 class TypeDAO{
 
+  final AuthService _auth = AuthService();
+
   Future<APIResponse<List<TypeModel>>> getAll() async{
     final String apiUrl = Constants.baseUrl + Constants.typeEndpoint;
 
     try {
+
+     String? token = await _auth.getUserToken();
+
       final response = await http.get(
-          Uri.parse(apiUrl));
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
 
       final jsonData = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -68,6 +79,9 @@ class TypeDAO{
     final String apiUrl = Constants.baseUrl + Constants.typeEndpoint;
 
     try{
+
+      String? token = await _auth.getUserToken();
+
       final body = jsonEncode({
         'name': name,
         'color': color,
@@ -79,6 +93,7 @@ class TypeDAO{
         body: body,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
         },
       );
 
@@ -107,6 +122,9 @@ class TypeDAO{
     final String apiUrl = '${Constants.baseUrl}${Constants.typeEndpoint}/$id';
 
     try{
+
+      String? token = await _auth.getUserToken();
+
       final body = jsonEncode({
         'name': name,
         'color': color,
@@ -119,7 +137,8 @@ class TypeDAO{
         body: body,
         headers: {
           'Content-Type': 'application/json',
-        }
+          'Authorization': 'Bearer $token'
+        },
       );
 
       final jsonData = json.decode(response.body);
