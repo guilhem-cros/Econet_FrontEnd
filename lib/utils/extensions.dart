@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 extension StringCasingExtension on String {
   String toCapitalized() => length > 0 ?'${this[0].toUpperCase()}${substring(1).toLowerCase()}':'';
@@ -21,8 +22,19 @@ extension StringExtension on Color {
   }
 }
 
-extension LocationExtension on String {
+extension LatLngExtension on String {
   toLocation() {
+    List<String> gpsList = split(";");
 
+    double latitude = double.parse(gpsList[0]);
+    double longitude = double.parse(gpsList[1]);
+
+    return LatLng(latitude, longitude);
+  }
+}
+
+extension GPSStringExtension on LatLng {
+  toStoredString() {
+    return("$latitude;$longitude");
   }
 }

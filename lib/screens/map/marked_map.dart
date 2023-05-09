@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -5,14 +7,17 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class MarkedMap extends StatefulWidget {
 
   final LocationPermission permission;
+  final List<Marker> markers;
 
-  const MarkedMap({Key? key, required this.permission}) : super(key: key);
+  const MarkedMap({Key? key, required this.permission, required this.markers}) : super(key: key);
 
   @override
   State<MarkedMap> createState() => _MarkedMapState();
 }
 
 class _MarkedMapState extends State<MarkedMap> {
+  final Completer<GoogleMapController> _controller = Completer();
+
 
   late Future<Position>? userPosition;
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -59,9 +64,13 @@ class _MarkedMapState extends State<MarkedMap> {
     return Stack(
         children: [
           userPosition == null
-              ? const GoogleMap(
+              ? GoogleMap(
             initialCameraPosition: _kGooglePlex,
             mapType: MapType.normal,
+            markers: Set<Marker>.of(widget.markers),
+            onMapCreated: (GoogleMapController controller) {
+              _controller.complete(controller);
+            },
           )
               : FutureBuilder<Position>(
               future: userPosition,
@@ -71,13 +80,21 @@ class _MarkedMapState extends State<MarkedMap> {
                     initialCameraPosition: getCamera(snapshot.data!),
                     mapType: MapType.normal,
                     myLocationEnabled: true,
+                    markers: Set<Marker>.of(widget.markers),
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                    },
                   );
                 } else if (snapshot.hasError) {
                   showPopUp(context, "Erreur lors de la localisation de l'appareil");
-                  return const GoogleMap(
+                  return GoogleMap(
                     initialCameraPosition: _kGooglePlex,
                     mapType: MapType.normal,
                     myLocationEnabled: true,
+                    markers: Set<Marker>.of(widget.markers),
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                    },
                   );
                 }
                 return const Center(child: CircularProgressIndicator(),);
