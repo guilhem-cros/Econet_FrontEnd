@@ -53,6 +53,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     permissionStatus = getPermissionStatus();
+    displayedEcospots = widget.ecospots == null ? [] : widget.ecospots!;
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_){
       if(widget.errMsg.isNotEmpty){
@@ -105,11 +106,20 @@ class _MapScreenState extends State<MapScreen> {
                             }
                         );
                       }
-                    }
-                )
-            ),
-            Positioned(bottom: 0,child: MapBar(currentEcospotsList: [], updateList: (){}),)
-          ]
+                  );
+                }
+              }
+            )
+          ),
+          Positioned(bottom: 0,
+            child: MapBar(currentEcospotsList: widget.ecospots == null ? [] : widget.ecospots!,
+            updateList: (List<EcospotModel> updatedList){
+              setState(() {
+                displayedEcospots = updatedList;
+              });
+            }
+          ),)
+        ]
       ),
     );
   }
