@@ -34,6 +34,7 @@ class MenuAppBar extends StatelessWidget with PreferredSizeWidget{
         CustomIconButton(
           onPressed: () async {
             await _auth.signOut();
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.power_settings_new),
         ),
