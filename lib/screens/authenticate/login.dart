@@ -132,6 +132,70 @@ class _Login extends State<Login> {
       ),
     );
 
+
+    final loginWithGoogleButton = Material(
+      elevation: 5.0,
+      borderRadius: BorderRadius.circular(30.0),
+      color: Colors.white,
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(20.0),
+        onPressed: () async {
+          dynamic result = await _auth.signInWithGoogle();
+            if (result?.uid == null) { //null means unsuccessfull authentication
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text(result.code),
+                    );
+                  });
+            }
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.ac_unit), // Icône Google
+            SizedBox(width: 10), // Espace entre l'icône et le texte
+            Text(
+              "Connexion avec Google",
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final separator = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.only(left: 10.0, right: 15.0),
+            child: Divider(
+              color: Colors.grey.shade300,
+              height: 36,
+            ),
+          ),
+        ),
+        Text(
+          'Ou connectez-vous avec',
+          style: TextStyle(color: Colors.grey),
+        ),
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.only(left: 15.0, right: 10.0),
+            child: Divider(
+              color: Colors.grey.shade300,
+              height: 36,
+            ),
+          ),
+        ),
+      ],
+    );
+
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -149,7 +213,7 @@ class _Login extends State<Login> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          const SizedBox(height: 25.0),
+                          const SizedBox(height: 5.0),
                           emailField,
                           const SizedBox(height: 35.0),
                           passwordField,
@@ -173,7 +237,11 @@ class _Login extends State<Login> {
                               txtbutton,
                             ],
                           ),
-                          const SizedBox(height: 15.0),
+                          const SizedBox(height: 5.0),
+                          separator,
+                          const SizedBox(height: 10.0),
+                          loginWithGoogleButton,
+                          const SizedBox(height: 10.0),
                         ],
                       ),
                     ),

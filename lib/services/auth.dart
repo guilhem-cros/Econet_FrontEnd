@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_upload/DAOs/client_DAO.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/client.dart';
@@ -8,6 +9,8 @@ import '../screens/authenticate/DTOs/loginuser_dto.dart';
 /// Class handling authentication via firebase
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
 
   /// Login to an existing firebase account using an email and a password
   /// Return the logged client
@@ -23,6 +26,48 @@ class AuthService {
       return FirebaseUser(code: e.code, uid: null);
     }
   }
+
+  Future<FirebaseUser?> signInWithGoogle() async {
+    try{
+      final clientDAO = ClientDAO();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+      // Create a new credential
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Once signed in, return the UserCredential
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      User? user = userCredential.user;
+
+      // Envoie les données à l'API après la création réussie de l'utilisateur
+      if (user != null) {
+        APIResponse<ClientModel> createdCli = await clientDAO.createClient(
+          fullName: user.displayName!,
+          pseudo: user.email!.split('@')[0],//TODO enlever apres le @
+          email: user.email!,
+          firebaseId: user.uid,
+        );
+
+        if(createdCli.error){
+          return FirebaseUser(code: "Server error", uid: null);
+        } else {
+          return _firebaseUser(user);
+        }
+      }
+    }
+    on FirebaseAuthException catch (e) {
+      return FirebaseUser(code: e.code, uid: null);
+    } catch (e) {
+      return FirebaseUser(code: e.toString(), uid: null);
+    }
+
+  }
+
+
 
   /// Register an user into firebase and then use its firbase id to store the client
   /// into the database
