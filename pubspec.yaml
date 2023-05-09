@@ -49,6 +49,9 @@ dependencies:
   flutter_colorpicker: ^1.0.3
   google_maps_flutter: ^2.2.6
   geolocator: ^9.0.2
+  google_places_flutter: ^2.0.5
+  address_search_field: ^5.0.3
+  flutter_dotenv: ^5.0.2
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +71,8 @@ dev_dependencies:
 flutter:
   assets:
     - map_assets/map_style.txt
+    - images/google.png
+    - .env
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
