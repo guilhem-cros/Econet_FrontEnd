@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_upload/screens/map/map_bar.dart';
 import 'package:image_upload/screens/map/marked_map.dart';
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../models/ecospot.dart';
 
@@ -25,8 +22,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final Completer<GoogleMapController> _controller = Completer();
 
-  late Future<PermissionStatus> permissionStatus;
-  late List<EcospotModel> displayedEcospots;
+  late Future<LocationPermission> permissionStatus;
 
   final List<Marker> _markers = [];
 
@@ -43,6 +39,14 @@ class _MapScreenState extends State<MapScreen> {
         );
       },
     );
+  }
+
+  Future<LocationPermission> getPermissionStatus() async {
+    return await Geolocator.checkPermission();
+  }
+
+  Future<LocationPermission> requestPermission() async {
+    return await Geolocator.requestPermission();
   }
 
 
@@ -63,42 +67,44 @@ class _MapScreenState extends State<MapScreen> {
 
     return Scaffold(
       body: Stack(
-        alignment: Alignment.topCenter,
-        children: [
+          alignment: Alignment.topCenter,
+          children: [
             SafeArea(
-            child: FutureBuilder<PermissionStatus>(
-              future: permissionStatus,
-              builder: (context, snapshot){
-                if (snapshot.hasData) {
-                  if(snapshot.data! == PermissionStatus.authorizedWhenInUse || snapshot.data! == PermissionStatus.authorizedAlways) {
-                    return MarkedMap(permission: snapshot.data!);
-                  } else {
-                    return FutureBuilder<PermissionStatus>(
-                        future: requestPermission(),
-                        builder: (context, snapshot) {
-                          if(snapshot.hasData){
-                            return MarkedMap(permission: snapshot.data!);
-                          } else if(snapshot.hasError) {
-                            return const MarkedMap(permission: PermissionStatus.denied);
-                          }
-                          else{
-                            return const Center(child: CircularProgressIndicator(),);
-                          }
-                        }
-                    );
-                  }
-                } else {
-                  return FutureBuilder<PermissionStatus>(
-                      future: requestPermission(),
-                      builder: (context, snapshot) {
-                        if(snapshot.hasData){
+                child: FutureBuilder<LocationPermission>(
+                    future: permissionStatus,
+                    builder: (context, snapshot){
+                      if (snapshot.hasData) {
+                        if(snapshot.data! == LocationPermission.whileInUse || snapshot.data! == LocationPermission.always) {
                           return MarkedMap(permission: snapshot.data!);
-                        } else if(snapshot.hasError) {
-                          return const MarkedMap(permission: PermissionStatus.denied);
+                        } else {
+                          return FutureBuilder<LocationPermission>(
+                              future: requestPermission(),
+                              builder: (context, snapshot) {
+                                if(snapshot.hasData){
+                                  return MarkedMap(permission: snapshot.data!);
+                                } else if(snapshot.hasError) {
+                                  return const MarkedMap(permission: LocationPermission.denied);
+                                }
+                                else{
+                                  return const Center(child: CircularProgressIndicator(),);
+                                }
+                              }
+                          );
                         }
-                        else{
-                          return const Center(child: CircularProgressIndicator(),);
-                        }
+                      } else {
+                        return FutureBuilder<LocationPermission>(
+                            future: requestPermission(),
+                            builder: (context, snapshot) {
+                              if(snapshot.hasData){
+                                return MarkedMap(permission: snapshot.data!);
+                              } else if(snapshot.hasError) {
+                                return const MarkedMap(permission: LocationPermission.denied);
+                              }
+                              else{
+                                return const Center(child: CircularProgressIndicator(),);
+                              }
+                            }
+                        );
                       }
                   );
                 }
