@@ -23,6 +23,7 @@ class _MapScreenState extends State<MapScreen> {
   final Completer<GoogleMapController> _controller = Completer();
 
   late Future<LocationPermission> permissionStatus;
+  late List<EcospotModel> displayedEcospots;
 
   final List<Marker> _markers = [];
 
@@ -72,21 +73,24 @@ class _MapScreenState extends State<MapScreen> {
             SafeArea(
                 child: FutureBuilder<LocationPermission>(
                     future: permissionStatus,
-                    builder: (context, snapshot){
+                    builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        if(snapshot.data! == LocationPermission.whileInUse || snapshot.data! == LocationPermission.always) {
+                        if (snapshot.data! == LocationPermission.whileInUse ||
+                            snapshot.data! == LocationPermission.always) {
                           return MarkedMap(permission: snapshot.data!);
                         } else {
                           return FutureBuilder<LocationPermission>(
                               future: requestPermission(),
                               builder: (context, snapshot) {
-                                if(snapshot.hasData){
+                                if (snapshot.hasData) {
                                   return MarkedMap(permission: snapshot.data!);
-                                } else if(snapshot.hasError) {
-                                  return const MarkedMap(permission: LocationPermission.denied);
+                                } else if (snapshot.hasError) {
+                                  return const MarkedMap(
+                                      permission: LocationPermission.denied);
                                 }
-                                else{
-                                  return const Center(child: CircularProgressIndicator(),);
+                                else {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),);
                                 }
                               }
                           );
@@ -95,22 +99,22 @@ class _MapScreenState extends State<MapScreen> {
                         return FutureBuilder<LocationPermission>(
                             future: requestPermission(),
                             builder: (context, snapshot) {
-                              if(snapshot.hasData){
+                              if (snapshot.hasData) {
                                 return MarkedMap(permission: snapshot.data!);
-                              } else if(snapshot.hasError) {
-                                return const MarkedMap(permission: LocationPermission.denied);
+                              } else if (snapshot.hasError) {
+                                return const MarkedMap(
+                                    permission: LocationPermission.denied);
                               }
-                              else{
-                                return const Center(child: CircularProgressIndicator(),);
+                              else {
+                                return const Center(
+                                  child: CircularProgressIndicator(),);
                               }
                             }
                         );
                       }
-                  );
-                }
-              }
-            )
-          ),
+                    }
+                  )
+            ),
           Positioned(bottom: 0,
             child: MapBar(currentEcospotsList: widget.ecospots == null ? [] : widget.ecospots!,
             updateList: (List<EcospotModel> updatedList){
