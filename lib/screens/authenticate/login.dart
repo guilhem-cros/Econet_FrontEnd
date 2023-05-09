@@ -133,15 +133,17 @@ class _Login extends State<Login> {
     );
 
 
-    final loginWithGoogleButton = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: Colors.white,
-      child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(20.0),
-        onPressed: () async {
-          dynamic result = await _auth.signInWithGoogle();
+    final loginWithGoogleButton = SizedBox(
+      width: 0.7 * MediaQuery.of(context).size.width,
+      child: Material(
+        elevation: 5.0,
+        borderRadius: BorderRadius.circular(30.0),
+        color: Colors.grey.shade200,
+        child: MaterialButton(
+          minWidth: 0.7 * MediaQuery.of(context).size.width,
+          padding: const EdgeInsets.all(10.0),
+          onPressed: () async {
+            dynamic result = await _auth.signInWithGoogle();
             if (result?.uid == null) { //null means unsuccessfull authentication
               showDialog(
                   context: context,
@@ -151,18 +153,19 @@ class _Login extends State<Login> {
                     );
                   });
             }
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.ac_unit), // Icône Google
-            SizedBox(width: 10), // Espace entre l'icône et le texte
-            Text(
-              "Connexion avec Google",
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
-              textAlign: TextAlign.center,
-            ),
-          ],
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset("images/google.png",width: 50), // Icône Google
+              const SizedBox(width: 10), // Espace entre l'icône et le texte
+              const Text(
+                "Google",
+                style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -179,7 +182,7 @@ class _Login extends State<Login> {
             ),
           ),
         ),
-        Text(
+        const Text(
           'Ou connectez-vous avec',
           style: TextStyle(color: Colors.grey),
         ),

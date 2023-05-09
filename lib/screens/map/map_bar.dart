@@ -4,6 +4,7 @@ import 'package:image_upload/models/ecospot.dart';
 import 'package:image_upload/models/type.dart';
 import 'package:image_upload/screens/menu/menu.dart';
 
+
 class MapBar extends StatefulWidget{
 
   final List<EcospotModel> currentEcospotsList;
@@ -23,7 +24,6 @@ class _MapBarState extends State<MapBar>{
   List<TypeModel> typeList= [];
 
   bool loadingTypes = false;
-
 
   @override
   Widget build(BuildContext context) {
