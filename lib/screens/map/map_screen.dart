@@ -26,6 +26,7 @@ class _MapScreenState extends State<MapScreen> {
   final Completer<GoogleMapController> _controller = Completer();
 
   late Future<PermissionStatus> permissionStatus;
+  late List<EcospotModel> displayedEcospots;
 
   final List<Marker> _markers = [];
 
@@ -48,8 +49,9 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     permissionStatus = getPermissionStatus();
+    displayedEcospots = widget.ecospots == null ? [] : widget.ecospots!;
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_){
       if(widget.errMsg.isNotEmpty){
         showError(context);
       }
@@ -103,7 +105,14 @@ class _MapScreenState extends State<MapScreen> {
               }
             )
           ),
-          Positioned(bottom: 0,child: MapBar(currentEcospotsList: [], updateList: (){}),)
+          Positioned(bottom: 0,
+            child: MapBar(currentEcospotsList: widget.ecospots == null ? [] : widget.ecospots!,
+            updateList: (List<EcospotModel> updatedList){
+              setState(() {
+                displayedEcospots = updatedList;
+              });
+            }
+          ),)
         ]
       ),
     );

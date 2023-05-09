@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:image_upload/models/Ecospot.dart';
+import 'package:image_upload/DAOs/type_DAO.dart';
+import 'package:image_upload/models/ecospot.dart';
+import 'package:image_upload/models/type.dart';
 import 'package:image_upload/screens/menu/menu.dart';
 
 class MapBar extends StatefulWidget{
 
   final List<EcospotModel> currentEcospotsList;
-  final void Function() updateList;
+  final void Function(List<EcospotModel>) updateList;
 
   const MapBar({super.key, required this.currentEcospotsList, required this.updateList});
 
@@ -18,18 +20,99 @@ class _MapBarState extends State<MapBar>{
 
   final TextEditingController _searchController = TextEditingController();
   List<String> selectedEcospotTypes = [];
+  List<TypeModel> typeList= [];
+
+  bool loadingTypes = false;
+
 
   @override
   Widget build(BuildContext context) {
 
-    void _filterList(String query) {
+    void showPopUp(String message){
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text(message),
+          );
+        },
+      );
+    }
+
+    void _filterList() {
       final List<EcospotModel> filteredList = widget.currentEcospotsList.where((ecospot) {
-        bool matchesType = selectedEcospotTypes.isEmpty || selectedEcospotTypes.contains(ecospot.mainType.name);
+        bool matchesType = selectedEcospotTypes.isEmpty || selectedEcospotTypes.contains(ecospot.mainType.id);
 
-        return matchesType;
+        bool matchesSecondaryType = false;
+        int i =0;
+        while(!matchesSecondaryType && i<ecospot.otherTypes.length){
+          matchesSecondaryType = selectedEcospotTypes.contains(ecospot.otherTypes[i]);
+          i++;
+        }
+
+        return matchesType || matchesSecondaryType;
       }).toList();
+      widget.updateList(filteredList);
+    }
 
-      widget.updateList();
+    void _fetchFilter() async {
+      setState(() {
+        loadingTypes = true;
+      });
+      final typeDAO = TypeDAO();
+      var result = await typeDAO.getAll();
+      if(result.error){
+        showPopUp(result.errorMessage!);
+      } else {
+        typeList = result.data!;
+      }
+      setState(() {
+        loadingTypes = false;
+      });
+    }
+
+    Widget buildFilterMenu() {
+      return PopupMenuButton<String>(
+        onSelected: (String value) {
+          setState(() {
+            if (selectedEcospotTypes.contains(value)) {
+              selectedEcospotTypes.remove(value);
+            } else {
+              selectedEcospotTypes.add(value);
+            }
+            _filterList();
+          });
+        },
+        itemBuilder: (BuildContext context) {
+          List<TypeModel> ecospotTypes = [];
+          if(typeList.isEmpty){
+            _fetchFilter();
+          }
+          for (TypeModel type in typeList) {
+            ecospotTypes.add(type);
+          }
+
+          return ecospotTypes.map((TypeModel type) {
+            return PopupMenuItem<String>(
+              value: type.id,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(type.name),
+                  Icon(selectedEcospotTypes.contains(type.id)
+                      ? Icons.check
+                      : Icons.add),
+                ],
+              ),
+            );
+          }).toList();
+        },
+        position: PopupMenuPosition.over,
+        icon: loadingTypes ?
+          const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
+            :
+          const Icon(Icons.filter_alt_outlined, size: 26,)
+      );
     }
 
     final searchBar = SizedBox(
@@ -37,7 +120,7 @@ class _MapBarState extends State<MapBar>{
       height: 42,
       child: TextField(
         controller: _searchController,
-        onChanged: _filterList,
+        onChanged: (String query){},
         decoration: InputDecoration(
           labelText: 'Rechercher une adresse',
           prefixIcon: const Icon(Icons.search),
@@ -81,11 +164,7 @@ class _MapBarState extends State<MapBar>{
              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 searchBar,
-                IconButton(
-                    onPressed: (){},
-                    icon: const Icon(Icons.filter_alt_outlined),
-                    iconSize: 28,
-                )
+                buildFilterMenu(),
               ],
             ),
           ),
