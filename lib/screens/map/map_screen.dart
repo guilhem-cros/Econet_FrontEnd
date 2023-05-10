@@ -6,13 +6,17 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_upload/DAOs/ecospot_DAO.dart';
 import 'package:image_upload/screens/map/map_bar.dart';
 import 'package:image_upload/screens/map/marked_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_upload/utils/extensions.dart';
-import 'package:image_upload/widgets/ecospot_card.dart';
+import 'package:image_upload/widgets/custom_buttons/icon_button.dart';
+import 'package:image_upload/screens/ecospots/ecospot_card.dart';
 
+import '../../DAOs/client_DAO.dart';
 import '../../models/ecospot.dart';
+import '../ecospots/ecospot_form.dart';
 import '../home/home.dart';
 
 class MapScreen extends StatefulWidget {
@@ -76,20 +80,80 @@ class _MapScreenState extends State<MapScreen> {
 
   }
 
+  void updateEcospotInList(EcospotModel updatedEcospot, List<EcospotModel> toUpdate){
+    int index = toUpdate.indexWhere((ecospot) => ecospot.id == updatedEcospot.id);
+    if (index != -1) {
+      toUpdate[index] = updatedEcospot;
+    }
+    toUpdate.sort((a, b) => a.name.toUpperCase().compareTo(b.name.toUpperCase()));
+  }
+
+  void updateLists(EcospotModel toUpdate){
+    updateEcospotInList(toUpdate, widget.ecospots!);
+    updateEcospotInList(toUpdate, displayedEcospots);
+    updateEcospotInList(toUpdate, Home.currentClient!.createdEcospots);
+    updateEcospotInList(toUpdate, Home.currentClient!.favEcospots);
+    fillMarkers(); // really useful ???
+    setState(() {});
+  }
+
+  void deleteIn(EcospotModel toDelete, List<EcospotModel> list){
+    int index = list.indexWhere((spot) => spot.id == toDelete.id);
+    if(index!=-1){
+      list.removeAt(index);
+    }
+  }
+
+  void onDelete(EcospotModel toDelete){
+
+    final EcospotDAO dao = EcospotDAO();
+    dao.delete(id: toDelete.id);
+
+    deleteIn(toDelete, widget.ecospots!);
+    deleteIn(toDelete, displayedEcospots);
+    deleteIn(toDelete, Home.currentClient!.favEcospots);
+    deleteIn(toDelete, Home.currentClient!.createdEcospots);
+
+    int index = _markers.indexWhere((element) => element.markerId.value == toDelete.id);
+    if(index!=-1){
+      _markers.removeAt(index);
+    }
+    setState(() {});
+  }
+
+  void onFav(bool isFav, EcospotModel ecospot){
+    if(isFav){
+      Home.currentClient!.favEcospots.add(ecospot);
+    } else {
+      int index = Home.currentClient!.favEcospots.indexWhere((spot) => ecospot.id == spot.id);
+      Home.currentClient!.favEcospots.removeAt(index);
+    }
+    final ClientDAO clientDAO = ClientDAO();
+    clientDAO.updateClient(updateClient: Home.currentClient!);
+  }
+
   void showSpotInfo(EcospotModel ecospot){
     showDialog(context: context,
         builder: (context) {
-          return EcospotCard(displayedEcospot: ecospot, favEcospots: Home.currentClient!.favEcospots, isAdmin: Home.currentClient!.isAdmin,);
+          return EcospotCard(
+            displayedEcospot: ecospot,
+            favEcospots: Home.currentClient!.favEcospots,
+            isAdmin: Home.currentClient!.isAdmin,
+            onUpdate: (){updateLists(ecospot);},
+            onDelete: (){onDelete(ecospot);},
+            onFav: (bool isFav){onFav(isFav, ecospot);},
+          );
         }
     );
   }
 
   void fillMarkers() async {
     setState(() {
+      _markers.clear();
       loadingMarkers = true;
     });
     if(widget.ecospots!=null) {
-      for (EcospotModel spot in widget.ecospots!) {
+      for (EcospotModel spot in displayedEcospots) {
         BitmapDescriptor icon;
         if(!loadedUrl.containsKey(spot.mainType.logoUrl)){
           icon = BitmapDescriptor.fromBytes(await _loadMarkerIcon(spot.mainType.logoUrl));
@@ -122,6 +186,33 @@ class _MapScreenState extends State<MapScreen> {
         showError(context);
       }
     });
+  }
+
+  void hasCreated() async {
+    final addedItem = await Navigator.push<EcospotModel>(context, MaterialPageRoute(builder:
+        (context) => const EcospotFormScreen(isPublicationForm: false,)
+    ));
+    if(addedItem!=null) {
+      if(Home.currentClient!.isAdmin) { //adding to map if client is admin (means that ecospot is set as published)
+        if (widget.ecospots != null) {
+          widget.ecospots!.add(addedItem);
+        }
+        displayedEcospots.add(addedItem);
+        BitmapDescriptor icon = BitmapDescriptor.fromBytes(
+            await _loadMarkerIcon(addedItem.mainType.logoUrl));
+        _markers.add(Marker(
+          markerId: MarkerId(addedItem.id),
+          position: addedItem.address.toLocation(),
+          icon: icon,
+          onTap: () {
+            showSpotInfo(addedItem);
+          },
+        ));
+      }
+      int index2 = Home.currentClient!.createdEcospots.indexWhere((spot) => spot.name.toUpperCase().compareTo(addedItem.name.toUpperCase()) > 0);
+      index2 == -1 ? Home.currentClient!.createdEcospots.add(addedItem) : Home.currentClient!.createdEcospots.insert(index2, addedItem);
+      setState(() {});
+    }
   }
 
   @override
@@ -179,12 +270,25 @@ class _MapScreenState extends State<MapScreen> {
                     }
                   )
             ),
+          Positioned(
+            bottom: 150,
+            right: 15,
+            child: CustomIconButton(
+              onPressed: hasCreated,
+              icon: const Icon(Icons.add),
+              backgroundColor: Colors.white,
+              iconColor: const Color.fromRGBO(3, 208, 36, 1),
+              radius: 30,
+              size: 30,
+              stroke: true,
+            ),
+          ),
           Positioned(bottom: 0,
-            child: MapBar(currentEcospotsList: widget.ecospots == null ? [] : widget.ecospots!,
+            child: MapBar(currentEcospotsList: displayedEcospots, allEcospots: widget.ecospots == null ? [] : widget.ecospots!,
             updateList: (List<EcospotModel> updatedList){
               setState(() {
                 displayedEcospots = updatedList;
-                //TODO update markers
+                fillMarkers();
               });
             }
           ),)

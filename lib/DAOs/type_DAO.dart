@@ -13,6 +13,35 @@ class TypeDAO{
 
   final AuthService _auth = AuthService();
 
+
+  Future<APIResponse<TypeModel>> getById({required String id}) async {
+    final String apiUrl = "${Constants.baseUrl}${Constants.typeEndpoint}/$id";
+
+    try {
+
+      String? token = await _auth.getUserToken();
+
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
+
+      final jsonData = json.decode(response.body);
+      if (response.statusCode == 200) {
+        return APIResponse(data: TypeModel.fromJson(jsonData));
+      } else {
+        return APIResponse(error: true, errorMessage: jsonData['message']);
+      }
+    } catch (err) {
+      return APIResponse(error: true, errorMessage: err.toString());
+    }
+
+  }
+
+
   Future<APIResponse<List<TypeModel>>> getAll() async{
     final String apiUrl = Constants.baseUrl + Constants.typeEndpoint;
 
