@@ -8,8 +8,9 @@ class MarkedMap extends StatefulWidget {
 
   final LocationPermission permission;
   final List<Marker> markers;
+  final Position? cameraPosition;
 
-  const MarkedMap({Key? key, required this.permission, required this.markers}) : super(key: key);
+  const MarkedMap({Key? key, required this.permission, required this.markers, this.cameraPosition}) : super(key: key);
 
   @override
   State<MarkedMap> createState() => _MarkedMapState();

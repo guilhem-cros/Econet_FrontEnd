@@ -68,9 +68,15 @@ class EcospotDAO{
     final String apiUrl = Constants.baseUrl + Constants.ecospotEndpoint + Constants.checkAddressEndpoint;
 
     try {
+
+      String? token = await _auth.getUserToken();
+
       final response = await http.post(
         Uri.parse(apiUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
         body: json.encode({'address': address}),
       );
 

@@ -8,9 +8,10 @@ import 'package:image_upload/screens/menu/menu.dart';
 class MapBar extends StatefulWidget{
 
   final List<EcospotModel> currentEcospotsList;
+  final List<EcospotModel> allEcospots;
   final void Function(List<EcospotModel>) updateList;
 
-  const MapBar({super.key, required this.currentEcospotsList, required this.updateList});
+  const MapBar({super.key, required this.currentEcospotsList, required this.allEcospots, required this.updateList});
 
   @override
   State<MapBar> createState() => _MapBarState();
@@ -40,7 +41,7 @@ class _MapBarState extends State<MapBar>{
     }
 
     void _filterList() {
-      final List<EcospotModel> filteredList = widget.currentEcospotsList.where((ecospot) {
+      final List<EcospotModel> filteredList = widget.allEcospots.where((ecospot) {
         bool matchesType = selectedEcospotTypes.isEmpty || selectedEcospotTypes.contains(ecospot.mainType.id);
 
         bool matchesSecondaryType = false;
@@ -109,7 +110,7 @@ class _MapBarState extends State<MapBar>{
         },
         position: PopupMenuPosition.over,
         icon: loadingTypes ?
-          const SizedBox(width: 20, height: 20, child: CircularProgressIndicator())
+          const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5,))
             :
           const Icon(Icons.filter_alt_outlined, size: 26,)
       );
