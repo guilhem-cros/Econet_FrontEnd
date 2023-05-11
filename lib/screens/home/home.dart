@@ -64,7 +64,10 @@ class _Home extends State<Home>{
             errMsg = snapshot.error!.toString();
           }
           if(errMsg.isNotEmpty || listToSend != null){
-            return MapScreen(ecospots: listToSend, errMsg: errMsg);
+             return MapScreen(
+              ecospots: listToSend,
+              errMsg: errMsg
+             );
           }
           return const CircularProgressIndicator();
         },

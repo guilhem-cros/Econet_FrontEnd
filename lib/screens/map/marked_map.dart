@@ -3,14 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_upload/models/displayed_ecospot.dart';
+import 'package:image_upload/utils/extensions.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/ecospot.dart';
 
 class MarkedMap extends StatefulWidget {
 
   final LocationPermission permission;
   final List<Marker> markers;
   final Position? cameraPosition;
+  final void Function() showSpot;
 
-  const MarkedMap({Key? key, required this.permission, required this.markers, this.cameraPosition}) : super(key: key);
+  const MarkedMap({Key? key, required this.permission, required this.markers, this.cameraPosition, required this.showSpot}) : super(key: key);
 
   @override
   State<MarkedMap> createState() => _MarkedMapState();
@@ -19,15 +25,10 @@ class MarkedMap extends StatefulWidget {
 class _MarkedMapState extends State<MarkedMap> {
   final Completer<GoogleMapController> _controller = Completer();
 
-
   late Future<Position>? userPosition;
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(
-      50.610769,
-      8.876716,
-    ),
-    zoom: 14,
-  );
+  late bool userCentered;
+
+  late DisplayedEcospot _changeNotifier;
 
   @override
   void initState() {
@@ -39,13 +40,31 @@ class _MarkedMapState extends State<MarkedMap> {
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _changeNotifier = Provider.of<DisplayedEcospot>(context);
+    setCameraAndOpenPopup(_changeNotifier.value);
+  }
+
+  void setCameraAndOpenPopup(EcospotModel? ecospot) async{
+    if(ecospot!=null) {
+      final mapController = await _controller.future;
+      mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+              CameraPosition(target: ecospot.address.toLocation(), zoom: 17))
+      );
+      widget.showSpot();
+    }
+  }
+
   CameraPosition getCamera(Position position) {
     return CameraPosition(
       target: LatLng(
         position.latitude,
         position.longitude,
       ),
-      zoom: 14,
+      zoom: 15,
     );
   }
 
@@ -62,36 +81,31 @@ class _MarkedMapState extends State<MarkedMap> {
 
   @override
   Widget build(BuildContext context) {
+
+    const CameraPosition kGooglePlex = CameraPosition(
+      target: LatLng(
+        50.610769,
+        8.876716,
+      ),
+      zoom: 15,
+    );
+
     return Stack(
         children: [
-          userPosition == null
-              ? GoogleMap(
-            initialCameraPosition: _kGooglePlex,
-            mapType: MapType.normal,
-            markers: Set<Marker>.of(widget.markers),
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-            },
-          )
-              : FutureBuilder<Position>(
+          FutureBuilder<Position>(
               future: userPosition,
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if(snapshot.hasData || snapshot.hasError) {
+                  if (snapshot.hasError) {
+                    showPopUp(
+                        context,
+                        "Erreur lors de la localisation de l'appareil");
+                  }
                   return GoogleMap(
-                    initialCameraPosition: getCamera(snapshot.data!),
+                    initialCameraPosition: snapshot.hasData ? getCamera(
+                        snapshot.data!) : kGooglePlex,
                     mapType: MapType.normal,
-                    myLocationEnabled: true,
-                    markers: Set<Marker>.of(widget.markers),
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
-                    },
-                  );
-                } else if (snapshot.hasError) {
-                  showPopUp(context, "Erreur lors de la localisation de l'appareil");
-                  return GoogleMap(
-                    initialCameraPosition: _kGooglePlex,
-                    mapType: MapType.normal,
-                    myLocationEnabled: true,
+                    myLocationEnabled: userPosition != null,
                     markers: Set<Marker>.of(widget.markers),
                     onMapCreated: (GoogleMapController controller) {
                       _controller.complete(controller);

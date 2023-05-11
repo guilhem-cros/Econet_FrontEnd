@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/screens/ecospots/ecospot_form.dart';
 import 'package:image_upload/utils/extensions.dart';
+import 'package:provider/provider.dart';
+import '../../models/displayed_ecospot.dart';
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
-import '../../screens/home/home.dart';
 import '../ecospot_list_item.dart';
 
 
@@ -12,7 +13,7 @@ class EcospotsList extends StatefulWidget {
   final List<TypeModel> typeList;
   final bool isPublicationList;
 
-  const EcospotsList({Key? key, required this.ecospotsList, required this.typeList, this.isPublicationList = false}) : super(key: key);
+  const EcospotsList({Key? key, required this.ecospotsList, required this.typeList, this.isPublicationList = false,}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -68,16 +69,9 @@ class _EcospotsList extends State<EcospotsList> {
       setState(() {});
     }
 
-    else { //TODO redirect to popup card
-      final updatedItem = await Navigator.push(context, MaterialPageRoute(builder:
-      (context) => EcospotFormScreen(toUpdateEcospot: ecospot)
-      ));
-      if(updatedItem!=null){
-        updateEcospotInList(updatedItem, widget.ecospotsList);
-        setState(() {});
-        updateEcospotInList(updatedItem, Home.currentClient!.createdEcospots);
-        updateEcospotInList(updatedItem, Home.currentClient!.favEcospots);
-      }
+    else {
+      Provider.of<DisplayedEcospot>(context, listen: false).value = ecospot;
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
