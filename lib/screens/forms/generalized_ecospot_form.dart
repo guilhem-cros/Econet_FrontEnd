@@ -38,12 +38,13 @@ class _EcospotForm  extends State<EcospotForm>{
 
   TextEditingController _spotName = TextEditingController();
   TextEditingController _spotType = TextEditingController();
-  TextEditingController _spotAdress = TextEditingController();
+  TextEditingController _spotAddress = TextEditingController();
   TextEditingController _spotDetails = TextEditingController();
   TextEditingController _spotTips = TextEditingController();
   String? selectedTypeId;
   String? latLngString;
   List<String> selectedSecondaryTypeIds = [];
+  String? initialAddressValue;
 
   final GlobalKey<FormFieldState> _addressFieldKey = GlobalKey<FormFieldState>();
   List<String> _suggestedAddresses = [];
@@ -82,12 +83,14 @@ class _EcospotForm  extends State<EcospotForm>{
       NetworkUtility.getPlaceAddress(widget.toUpdateEcospot!.address).then((address) {
         setState(() {
           _spotName = TextEditingController(text: widget.toUpdateEcospot!.name);
-          _spotAdress = TextEditingController(text: address); //TODO
+          _spotAddress = TextEditingController(text: address);
           _spotDetails = TextEditingController(text: widget.toUpdateEcospot!.details);
           _spotTips = TextEditingController(text: widget.toUpdateEcospot!.tips);
           _spotType = TextEditingController(text: widget.toUpdateEcospot!.mainType.name);
           selectedTypeId = widget.toUpdateEcospot!.mainType.id;
           selectedSecondaryTypeIds = widget.toUpdateEcospot!.otherTypes;
+          initialAddressValue = address;
+          latLngString = widget.toUpdateEcospot!.address;
         });
       });
     }
@@ -131,7 +134,7 @@ class _EcospotForm  extends State<EcospotForm>{
     if (selectedImage != null) {
       try {
         final checkResult = await ecospotDAO.checkAddressUnique(
-          address: _spotAdress.text,
+          address: _spotAddress.text,
         );
         if (!checkResult.error) {
           if (!checkResult.data!['isUnique']) {
@@ -176,9 +179,9 @@ class _EcospotForm  extends State<EcospotForm>{
   void update() async {
     try{
       bool uploadable = true;
-      if(_spotAdress.text != widget.toUpdateEcospot!.address){
+      if(_spotAddress.text != initialAddressValue){
         final checkResult = await ecospotDAO.checkAddressUnique(
-          address: _spotAdress.text,
+          address: _spotAddress.text,
         );
         if (!checkResult.error) {
           if (!checkResult.data!['isUnique']) {
@@ -201,7 +204,7 @@ class _EcospotForm  extends State<EcospotForm>{
         APIResponse<EcospotModel> result = await ecospotDAO.updateEcospot(
             id: widget.toUpdateEcospot!.id,
             name: _spotName.text,
-            address: latLngString!,
+            address: latLngString!, //LA
             details: _spotDetails.text,
             tips: _spotTips.text,
             mainTypeId: selectedTypeId!,
@@ -332,7 +335,7 @@ class _EcospotForm  extends State<EcospotForm>{
 
     final adressField = SearchLocation(
         top: false,
-        controller: _spotAdress,
+        controller: _spotAddress,
         onSelectedLocation: (LatLng? latLng) {
           setLatLngString(latLng!);
         },
@@ -345,7 +348,7 @@ class _EcospotForm  extends State<EcospotForm>{
         validator: (value) {
           if (value == null || value.trim().isEmpty) {
             return 'Ce champ est requis';
-          } else if (!_suggestedAddresses.contains(value)) {
+          } else if ((!isCreation && initialAddressValue != null && initialAddressValue != _spotAddress?.text) && (_suggestedAddresses != null && !_suggestedAddresses.contains(value))) {
             return 'Veuillez saisir une adresse valide';
           }
           return null;
