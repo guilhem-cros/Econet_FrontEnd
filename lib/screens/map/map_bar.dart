@@ -120,24 +120,6 @@ class _MapBarState extends State<MapBar>{
       );
     }
 
-    final searchBar = SizedBox(
-      width: 0.75*MediaQuery.of(context).size.width,
-      height: 42,
-      child: TextField(
-        controller: _searchController,
-        onChanged: (String query){},
-        decoration: InputDecoration(
-          labelText: 'Rechercher une adresse',
-          prefixIcon: const Icon(Icons.search),
-          filled: true,
-          fillColor: const Color.fromARGB(255, 238, 238, 238),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide.none),
-              contentPadding: const EdgeInsets.all(0),
-        ),
-      )
-    );
 
     final menuButton = ElevatedButton.icon(
       onPressed: (){
@@ -181,7 +163,8 @@ class _MapBarState extends State<MapBar>{
                     ),top: true,
                       onSelectedLocation: (LatLng? latLng) {
                         print(latLng);
-                      }
+                      },
+                    controller: _searchController,
                     ),
                 ),
                 buildFilterMenu(),

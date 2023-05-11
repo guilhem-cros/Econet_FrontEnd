@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_upload/models/ecospot.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/utils/extensions.dart';
@@ -9,10 +10,13 @@ import '../../screens/home/home.dart';
 import '../../services/storage_service.dart';
 import 'package:collection/collection.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:image_upload/utils/extensions.dart';
 
 
 import '../../DAOs/type_DAO.dart';
 import '../../models/type.dart';
+import '../../utils/network_utility.dart';
+import '../../widgets/search_location.dart';
 import '../error/error_screen.dart';
 
 class EcospotForm extends StatefulWidget{
@@ -38,7 +42,12 @@ class _EcospotForm  extends State<EcospotForm>{
   TextEditingController _spotDetails = TextEditingController();
   TextEditingController _spotTips = TextEditingController();
   String? selectedTypeId;
+  String? latLngString;
   List<String> selectedSecondaryTypeIds = [];
+
+  final GlobalKey<FormFieldState> _addressFieldKey = GlobalKey<FormFieldState>();
+  List<String> _suggestedAddresses = [];
+
 
   late bool _isUploading;
   late bool isCreation;
@@ -70,18 +79,26 @@ class _EcospotForm  extends State<EcospotForm>{
     _typeList = typeDAO.getAll();
     _isUploading = false;
     if(!isCreation){
-      _spotName = TextEditingController(text: widget.toUpdateEcospot!.name);
-      _spotAdress = TextEditingController(text: widget.toUpdateEcospot!.address);
-      _spotDetails = TextEditingController(text: widget.toUpdateEcospot!.details);
-      _spotTips = TextEditingController(text: widget.toUpdateEcospot!.tips);
-      _spotType = TextEditingController(text: widget.toUpdateEcospot!.mainType.name);
-      selectedTypeId = widget.toUpdateEcospot!.mainType.id;
-      selectedSecondaryTypeIds = widget.toUpdateEcospot!.otherTypes;
+      NetworkUtility.getPlaceAddress(widget.toUpdateEcospot!.address).then((address) {
+        setState(() {
+          _spotName = TextEditingController(text: widget.toUpdateEcospot!.name);
+          _spotAdress = TextEditingController(text: address); //TODO
+          _spotDetails = TextEditingController(text: widget.toUpdateEcospot!.details);
+          _spotTips = TextEditingController(text: widget.toUpdateEcospot!.tips);
+          _spotType = TextEditingController(text: widget.toUpdateEcospot!.mainType.name);
+          selectedTypeId = widget.toUpdateEcospot!.mainType.id;
+          selectedSecondaryTypeIds = widget.toUpdateEcospot!.otherTypes;
+        });
+      });
     }
   }
 
   void setTypeList(List<TypeModel> typeList){
     widget.typeList = typeList;
+  }
+
+  void setLatLngString(LatLng latLng){
+    latLngString = latLng.toStoredString();
   }
 
   void setUpload(bool isUploading){
@@ -124,7 +141,7 @@ class _EcospotForm  extends State<EcospotForm>{
             final urlPic = await uploadImage();
             APIResponse<EcospotModel> result = await ecospotDAO.createEcospot(
                 name: _spotName.text,
-                address: _spotAdress.text,
+                address: latLngString!,
                 details: _spotDetails.text,
                 tips: _spotTips.text,
                 mainTypeId: selectedTypeId!,
@@ -184,7 +201,7 @@ class _EcospotForm  extends State<EcospotForm>{
         APIResponse<EcospotModel> result = await ecospotDAO.updateEcospot(
             id: widget.toUpdateEcospot!.id,
             name: _spotName.text,
-            address: _spotAdress.text,
+            address: latLngString!,
             details: _spotDetails.text,
             tips: _spotTips.text,
             mainTypeId: selectedTypeId!,
@@ -313,12 +330,23 @@ class _EcospotForm  extends State<EcospotForm>{
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
 
 
-    final adressField = TextFormField(
+    final adressField = SearchLocation(
+        top: false,
         controller: _spotAdress,
-        autofocus: false,
+        onSelectedLocation: (LatLng? latLng) {
+          setLatLngString(latLng!);
+        },
+        formFieldKey: _addressFieldKey,
+        onSuggestionsUpdate: (suggestions) {
+          setState(() {
+            _suggestedAddresses = suggestions;
+          });
+        },
         validator: (value) {
           if (value == null || value.trim().isEmpty) {
             return 'Ce champ est requis';
+          } else if (!_suggestedAddresses.contains(value)) {
+            return 'Veuillez saisir une adresse valide';
           }
           return null;
         } ,
@@ -388,13 +416,15 @@ class _EcospotForm  extends State<EcospotForm>{
         minWidth: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(20.0),
         onPressed: () async {
-          if (_formKey.currentState!.validate()) {
+          if (_formKey.currentState!.validate() && _addressFieldKey.currentState!.validate()) {
               setUpload(true);
               if (isCreation) {
                 create();
               } else {
                 update();
               }
+            } else {
+            _addressFieldKey.currentState!.validate();
             }
         },
         child: !_isUploading? (!widget.isAdmin ? const Text(

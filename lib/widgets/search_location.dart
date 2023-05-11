@@ -17,8 +17,11 @@ class SearchLocation extends StatefulWidget {
   final InputDecoration decoration;
   final ValueChanged<LatLng?> onSelectedLocation;
   final FormFieldValidator<String>? validator;
+  final GlobalKey<FormFieldState>? formFieldKey;
+  final ValueChanged<List<String>>? onSuggestionsUpdate;
+  final TextEditingController controller;
 
-  const SearchLocation({Key? key, required this.top, required this.decoration, required this.onSelectedLocation, this.validator}) : super(key: key);
+  const SearchLocation({Key? key, required this.top, required this.decoration, required this.onSelectedLocation, this.validator, this.formFieldKey, this.onSuggestionsUpdate, required this.controller}) : super(key: key);
 
   @override
   State<SearchLocation> createState() => _SearchLocationState();
@@ -26,14 +29,14 @@ class SearchLocation extends StatefulWidget {
 
 class _SearchLocationState extends State<SearchLocation> {
   List<AutocompletePrediction> placePredictions = [];
-  final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  bool _autovalidateMode = false;
 
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_onSearchChanged);
+    widget.controller.addListener(_onSearchChanged);
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
         // If search bar is not in focus, clear the list
@@ -46,14 +49,20 @@ class _SearchLocationState extends State<SearchLocation> {
 
   @override
   void dispose() {
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.dispose();
+    widget.controller.removeListener(_onSearchChanged);
+    widget.controller.dispose();
     _focusNode.dispose();
     super.dispose();
   }
 
   void _onSearchChanged() {
-    placeAutocomplete(_searchController.text);
+    placeAutocomplete(widget.controller.text);
+  }
+
+  void validate() {
+    setState(() {
+      _autovalidateMode = true;
+    });
   }
 
   Future<LatLng> getLatLng(String address) async {
@@ -90,6 +99,9 @@ class _SearchLocationState extends State<SearchLocation> {
         setState(() {
           placePredictions = result.predictions!;
         });
+        if (widget.onSuggestionsUpdate != null) {
+          widget.onSuggestionsUpdate!(placePredictions.map((p) => p.description!).toList());
+        }
       }
     }
   }
@@ -98,8 +110,8 @@ class _SearchLocationState extends State<SearchLocation> {
   Widget build(BuildContext context) {
     return Column(children: [
       if (widget.top && placePredictions.isNotEmpty)
-        SizedBox(
-          height: 180,
+        Container(
+          constraints: BoxConstraints(maxHeight: 180),
           child: ListView.builder(
             padding: const EdgeInsets.only(top: 2),
             shrinkWrap: true,
@@ -110,7 +122,7 @@ class _SearchLocationState extends State<SearchLocation> {
                   String selectedAddress = placePredictions[index].description!;
                   LatLng? latLng = await getLatLng(selectedAddress);
                   widget.onSelectedLocation(latLng);
-                  _searchController.text = selectedAddress; // update the text field with the selected address
+                  widget.controller.text = selectedAddress; // update the text field with the selected address
                   print('Selected place: $selectedAddress, Coordinates: $latLng');
                 }
             ),
@@ -120,9 +132,11 @@ class _SearchLocationState extends State<SearchLocation> {
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: TextFormField(
+            key: widget.formFieldKey,
+            autovalidateMode: _autovalidateMode ? AutovalidateMode.always : AutovalidateMode.disabled,
             validator: widget.validator,
             focusNode: _focusNode,
-            controller: _searchController,
+            controller: widget.controller,
             onChanged: (value) {
               placeAutocomplete(value);
             },
@@ -132,8 +146,8 @@ class _SearchLocationState extends State<SearchLocation> {
         ),
       ),
       if (!widget.top && placePredictions.isNotEmpty)
-        SizedBox(
-          height: 180,
+        Container(
+          constraints: BoxConstraints(maxHeight: 180),
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: placePredictions.length,
@@ -143,7 +157,7 @@ class _SearchLocationState extends State<SearchLocation> {
                   String selectedAddress = placePredictions[index].description!;
                   LatLng? latLng = await getLatLng(selectedAddress);
                   widget.onSelectedLocation(latLng);
-                  _searchController.text = selectedAddress; // update the text field with the selected address
+                  widget.controller.text = selectedAddress; // update the text field with the selected address
                   print('Selected place: $selectedAddress, Coordinates: $latLng');
                 }
             ),
