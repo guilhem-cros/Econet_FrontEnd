@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_upload/DAOs/type_DAO.dart';
 import 'package:image_upload/models/ecospot.dart';
 import 'package:image_upload/models/type.dart';
 import 'package:image_upload/screens/menu/menu.dart';
+
+import '../../widgets/search_location.dart';
 
 
 class MapBar extends StatefulWidget{
@@ -74,6 +77,7 @@ class _MapBarState extends State<MapBar>{
 
     Widget buildFilterMenu() {
       return PopupMenuButton<String>(
+        padding: const EdgeInsets.only(bottom: 10),
         onSelected: (String value) {
           setState(() {
             if (selectedEcospotTypes.contains(value)) {
@@ -162,15 +166,31 @@ class _MapBarState extends State<MapBar>{
             decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color.fromRGBO(238, 238 , 238, 1)))),
             padding: const EdgeInsets.only(bottom: 3),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                searchBar,
+                Expanded(child:
+                  SearchLocation(decoration:
+                    InputDecoration(
+                      labelText: 'Rechercher une adresse',
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: const Color.fromARGB(255, 238, 238, 238),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0), borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.all(0),
+                    ),top: true,
+                      onSelectedLocation: (LatLng? latLng) {
+                        print(latLng);
+                      }
+                    ),
+                ),
                 buildFilterMenu(),
               ],
             ),
           ),
-          const SizedBox(height: 5,),
+          const SizedBox(height: 5),
           menuButton,
+          const SizedBox(height: 5),
         ],
       )
     );
