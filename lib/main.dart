@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:image_upload/models/displayed_ecospot.dart';
 import 'package:provider/provider.dart';
 
 import 'models/firebaseuser.dart';
@@ -18,9 +19,15 @@ class MyApp extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
-    return StreamProvider<FirebaseUser?>.value(
-      value: AuthService().user,
-      initialData: null,
+    return MultiProvider(providers: [
+        StreamProvider<FirebaseUser?>.value(
+          value: AuthService().user,
+          initialData: null,
+        ),
+        ChangeNotifierProvider<DisplayedEcospot>(
+          create: (_) => DisplayedEcospot(),
+        )
+      ],
       child: MaterialApp(
         theme: ThemeData(
           brightness: Brightness.light,

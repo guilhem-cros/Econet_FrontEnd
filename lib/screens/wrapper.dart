@@ -20,9 +20,8 @@ class Wrapper extends StatelessWidget{
     {
       return Handler();
     }
-    else
-    {
-      return Home(firebaseId: user.uid!);
+    else {
+            return Home(firebaseId: user.uid!);
     }
 
   }

@@ -14,7 +14,7 @@ class EcospotCard extends StatefulWidget {
   final EcospotModel displayedEcospot;
   final List<EcospotModel> favEcospots;
   final bool isAdmin;
-  final void Function() onUpdate;
+  final void Function(EcospotModel) onUpdate;
   final void Function() onDelete;
   final void Function(bool) onFav;
 
@@ -25,7 +25,7 @@ class EcospotCard extends StatefulWidget {
     required this.isAdmin,
     required this.onUpdate,
     required this.onDelete,
-    required this.onFav
+    required this.onFav,
   });
 
   @override
@@ -134,7 +134,7 @@ class _EcospotCardState extends State<EcospotCard> {
       onPressed:  () {
         Navigator.of(context).pop();
         widget.onDelete();
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       },
     );
 
@@ -179,7 +179,7 @@ class _EcospotCardState extends State<EcospotCard> {
       children: [
         const SizedBox(height: 15),
         CustomIconButton(
-          onPressed: (){Navigator.pop(context);},
+          onPressed: (){Navigator.pop(context, true);},
           icon: const Icon(Icons.close),
           iconColor: const Color.fromRGBO(94, 100, 114, 1),
         ),
@@ -198,7 +198,7 @@ class _EcospotCardState extends State<EcospotCard> {
                     ecospot = updatedItem;
                   });
                   fetchOtherTypes(ecospot.otherTypes);
-                  widget.onUpdate();
+                  widget.onUpdate(updatedItem);
                   }
               },
               icon: const Icon(Icons.edit_outlined, color: Colors.white),

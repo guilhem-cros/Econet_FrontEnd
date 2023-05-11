@@ -13,8 +13,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:image_upload/utils/extensions.dart';
 import 'package:image_upload/widgets/custom_buttons/icon_button.dart';
 import 'package:image_upload/screens/ecospots/ecospot_card.dart';
+import 'package:provider/provider.dart';
 
 import '../../DAOs/client_DAO.dart';
+import '../../models/displayed_ecospot.dart';
 import '../../models/ecospot.dart';
 import '../ecospots/ecospot_form.dart';
 import '../home/home.dart';
@@ -93,7 +95,7 @@ class _MapScreenState extends State<MapScreen> {
     updateEcospotInList(toUpdate, displayedEcospots);
     updateEcospotInList(toUpdate, Home.currentClient!.createdEcospots);
     updateEcospotInList(toUpdate, Home.currentClient!.favEcospots);
-    fillMarkers(); // really useful ???
+    fillMarkers();
     setState(() {});
   }
 
@@ -132,19 +134,38 @@ class _MapScreenState extends State<MapScreen> {
     clientDAO.updateClient(updateClient: Home.currentClient!);
   }
 
-  void showSpotInfo(EcospotModel ecospot){
-    showDialog(context: context,
+  void showSpotInfo() async {
+    await showDialog(context: context,
         builder: (context) {
-          return EcospotCard(
-            displayedEcospot: ecospot,
-            favEcospots: Home.currentClient!.favEcospots,
-            isAdmin: Home.currentClient!.isAdmin,
-            onUpdate: (){updateLists(ecospot);},
-            onDelete: (){onDelete(ecospot);},
-            onFav: (bool isFav){onFav(isFav, ecospot);},
-          );
-        }
-    );
+          EcospotModel? ecospot = Provider.of<DisplayedEcospot>(context, listen: false).value;
+          if(ecospot!=null) {
+            return EcospotCard(
+              displayedEcospot: ecospot,
+              favEcospots: Home.currentClient!.favEcospots,
+              isAdmin: Home.currentClient!.isAdmin,
+              onUpdate: (EcospotModel spot) {
+                  Provider.of<DisplayedEcospot>(context, listen: false).value = spot;
+                  updateLists(spot);
+              },
+              onDelete: () {
+                onDelete(Provider.of<DisplayedEcospot>(context, listen: false).value!);
+              },
+              onFav: (bool isFav) {
+                onFav(isFav, ecospot);
+              },
+            );
+          } else {
+            return const AlertDialog(
+              title: Text("Erreur"),
+              content: Text("L'ecospot n'a pas pu être chargé."),
+            );
+          }
+        },
+    ).then((value){
+      if(value){
+        Provider.of<DisplayedEcospot>(context, listen: false).value=null;
+      }
+    });
   }
 
   void fillMarkers() async {
@@ -165,7 +186,9 @@ class _MapScreenState extends State<MapScreen> {
           markerId: MarkerId(spot.id),
           position: spot.address.toLocation(),
           icon:icon,
-          onTap: (){showSpotInfo(spot);},
+          onTap: (){
+            Provider.of<DisplayedEcospot>(context, listen: false).value=spot;
+          },
         ));
       }
     }
@@ -205,7 +228,7 @@ class _MapScreenState extends State<MapScreen> {
           position: addedItem.address.toLocation(),
           icon: icon,
           onTap: () {
-            showSpotInfo(addedItem);
+            Provider.of<DisplayedEcospot>(context, listen: false).value = addedItem;
           },
         ));
       }
@@ -232,16 +255,16 @@ class _MapScreenState extends State<MapScreen> {
                       if (snapshot.hasData) {
                         if (snapshot.data! == LocationPermission.whileInUse ||
                             snapshot.data! == LocationPermission.always) {
-                          return MarkedMap(permission: snapshot.data!, markers: _markers,);
+                          return MarkedMap(permission: snapshot.data!, markers: _markers, showSpot: showSpotInfo,);
                         } else {
                           return FutureBuilder<LocationPermission>(
                               future: requestPermission(),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
-                                  return MarkedMap(permission: snapshot.data!, markers: _markers,);
+                                  return MarkedMap(permission: snapshot.data!, markers: _markers,showSpot: showSpotInfo);
                                 } else if (snapshot.hasError) {
                                   return MarkedMap(
-                                      permission: LocationPermission.denied, markers: _markers,);
+                                      permission: LocationPermission.denied, markers: _markers,showSpot: showSpotInfo);
                                 }
                                 else {
                                   return const Center(
@@ -255,10 +278,13 @@ class _MapScreenState extends State<MapScreen> {
                             future: requestPermission(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
-                                return MarkedMap(permission: snapshot.data!, markers: _markers,);
+                                return MarkedMap(permission: snapshot.data!, markers: _markers, showSpot: showSpotInfo,);
                               } else if (snapshot.hasError) {
                                 return MarkedMap(
-                                    permission: LocationPermission.denied, markers: _markers,);
+                                  permission: LocationPermission.denied,
+                                  markers: _markers,
+                                  showSpot: showSpotInfo
+                                );
                               }
                               else {
                                 return const Center(
