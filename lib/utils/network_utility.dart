@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_upload/utils/extensions.dart';
 
 class NetworkUtility{
   static Future<String?> fetchUrl(Uri uri, {Map<String, String>? headers}) async{
@@ -12,5 +16,23 @@ class NetworkUtility{
       debugPrint(e.toString());
     }
     return null;
+  }
+
+  static Future<String> getPlaceAddress(String latLng) async {
+    double lat = latLng.toLocation().latitude;
+    double long = latLng.toLocation().longitude;
+    final response = await http.get(Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$long&key=${dotenv.env['API_KEY']}'));
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseJson = jsonDecode(response.body);
+      if (responseJson['status'] == 'OK') {
+        return responseJson['results'][0]['formatted_address'];
+      } else {
+        throw Exception('Failed to get address');
+      }
+    } else {
+      throw Exception('Failed to get address');
+    }
   }
 }
