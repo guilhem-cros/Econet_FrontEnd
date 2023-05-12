@@ -20,8 +20,9 @@ class SearchLocation extends StatefulWidget {
   final GlobalKey<FormFieldState>? formFieldKey;
   final ValueChanged<List<String>>? onSuggestionsUpdate;
   final TextEditingController controller;
+  final double padding;
 
-  const SearchLocation({Key? key, required this.top, required this.decoration, required this.onSelectedLocation, this.validator, this.formFieldKey, this.onSuggestionsUpdate, required this.controller}) : super(key: key);
+  const SearchLocation({Key? key, required this.top, required this.decoration, required this.onSelectedLocation, this.validator, this.formFieldKey, this.onSuggestionsUpdate, required this.controller, required this.padding}) : super(key: key);
 
   @override
   State<SearchLocation> createState() => _SearchLocationState();
@@ -130,7 +131,7 @@ class _SearchLocationState extends State<SearchLocation> {
         ),
       Form(
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(widget.padding),
           child: TextFormField(
             key: widget.formFieldKey,
             autovalidateMode: _autovalidateMode ? AutovalidateMode.always : AutovalidateMode.disabled,

@@ -165,6 +165,7 @@ class _MapBarState extends State<MapBar>{
                         print(latLng);
                       },
                     controller: _searchController,
+                    padding: 8,
                     ),
                 ),
                 buildFilterMenu(),

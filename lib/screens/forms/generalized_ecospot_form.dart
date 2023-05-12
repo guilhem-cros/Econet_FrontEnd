@@ -16,6 +16,7 @@ import 'package:image_upload/utils/extensions.dart';
 import '../../DAOs/type_DAO.dart';
 import '../../models/type.dart';
 import '../../utils/network_utility.dart';
+import '../../widgets/custom_buttons/icon_button.dart';
 import '../../widgets/search_location.dart';
 import '../error/error_screen.dart';
 
@@ -48,6 +49,7 @@ class _EcospotForm  extends State<EcospotForm>{
 
   final GlobalKey<FormFieldState> _addressFieldKey = GlobalKey<FormFieldState>();
   List<String> _suggestedAddresses = [];
+  LatLng? _location;
 
 
   late bool _isUploading;
@@ -204,7 +206,7 @@ class _EcospotForm  extends State<EcospotForm>{
         APIResponse<EcospotModel> result = await ecospotDAO.updateEcospot(
             id: widget.toUpdateEcospot!.id,
             name: _spotName.text,
-            address: latLngString!, //LA
+            address: latLngString!,
             details: _spotDetails.text,
             tips: _spotTips.text,
             mainTypeId: selectedTypeId!,
@@ -333,38 +335,56 @@ class _EcospotForm  extends State<EcospotForm>{
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
 
 
-    final adressField = SearchLocation(
-        top: false,
-        controller: _spotAddress,
-        onSelectedLocation: (LatLng? latLng) {
-          setLatLngString(latLng!);
-        },
-        formFieldKey: _addressFieldKey,
-        onSuggestionsUpdate: (suggestions) {
-          setState(() {
-            _suggestedAddresses = suggestions;
-          });
-        },
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            return 'Ce champ est requis';
-          } else if ((!isCreation && initialAddressValue != null && initialAddressValue != _spotAddress?.text) && (_suggestedAddresses != null && !_suggestedAddresses.contains(value))) {
-            return 'Veuillez saisir une adresse valide';
-          }
-          return null;
-        } ,
-        decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(20.0),
-            prefixIcon:
-            const Icon(
-              Icons.pin_drop,
-            ),
-            labelText: "Adresse/Position actuelle",
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            filled: true,
-            fillColor: const Color(0x3303d024),
-            border:
-            OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
+    final adressField =
+    Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(child:
+        SearchLocation(
+            top: false,
+            controller: _spotAddress,
+            onSelectedLocation: (LatLng? latLng) {
+              setLatLngString(latLng!);
+            },
+            formFieldKey: _addressFieldKey,
+            onSuggestionsUpdate: (suggestions) {
+              setState(() {
+                _suggestedAddresses = suggestions;
+              });
+            },
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Ce champ est requis';
+              } else if (( !_suggestedAddresses.contains(value) && latLngString == null)) {
+                return 'Veuillez saisir une adresse valide';
+              }
+              return null;
+            } ,
+            padding: 0,
+            decoration: InputDecoration(
+                contentPadding: const EdgeInsets.all(20.0),
+                prefixIcon:
+                const Icon(
+                  Icons.pin_drop,
+                ),
+                labelText: "Adresse/Position actuelle",
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                filled: true,
+                fillColor: const Color(0x3303d024),
+                border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none))),
+        ),
+        Padding(padding: EdgeInsets.only(top: 13,left: 5), child:
+          CustomIconButton(onPressed: () async{
+            _spotAddress.text = "Ma position actuelle";
+            LatLng currentLocation = await NetworkUtility.getCurrentLocation();
+            setLatLngString(currentLocation);
+            print(latLngString);
+          }, icon: Icon(Icons.location_searching))
+          )
+      ],
+    );
 
 
     final detailsField = TextFormField(
