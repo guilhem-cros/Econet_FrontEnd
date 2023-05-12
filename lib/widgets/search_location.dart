@@ -1,9 +1,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_upload/utils/network_utility.dart';
-import 'package:image_upload/widgets/lists/location_list.dart';
+import 'package:image_upload/widgets/lists/location_list_item.dart';
+
+
+
+
 
 
 import '../models/place_autocomplete_response.dart';
@@ -29,7 +34,9 @@ class _SearchLocationState extends State<SearchLocation> {
   List<AutocompletePrediction> placePredictions = [];
   final FocusNode _focusNode = FocusNode();
   bool _autovalidateMode = false;
+  bool outFocus = false;
 
+  final _keyboardVisibilityController = KeyboardVisibilityController();
 
   @override
   void initState() {
@@ -37,11 +44,27 @@ class _SearchLocationState extends State<SearchLocation> {
     widget.controller.addListener(_onSearchChanged);
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
-        // If search bar is not in focus, clear the list
         setState(() {
-          placePredictions = [];
+          outFocus = true;
         });
+        FocusScope.of(context).unfocus();
       }
+      if(_focusNode.hasFocus){
+        outFocus = false;
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _keyboardVisibilityController.onChange.listen((bool visible) {
+        if(mounted){
+          setState(() {
+            if (!visible) {
+              outFocus = true;
+            } else {
+              outFocus = false;
+            }
+          });
+        }
+      });
     });
   }
 
@@ -54,12 +77,15 @@ class _SearchLocationState extends State<SearchLocation> {
   }
 
   void _onSearchChanged() {
-    placeAutocomplete(widget.controller.text);
+    if(!outFocus) {
+      placeAutocomplete(widget.controller.text);
+    }
   }
 
   void validate() {
     setState(() {
       _autovalidateMode = true;
+      outFocus = true;
     });
   }
 
@@ -92,26 +118,34 @@ class _SearchLocationState extends State<SearchLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      if (widget.top && placePredictions.isNotEmpty)
-        Container(
-          constraints: BoxConstraints(maxHeight: 180),
-          child: ListView.builder(
-            padding: const EdgeInsets.only(top: 2),
-            shrinkWrap: true,
-            itemCount: placePredictions.length,
-            itemBuilder: (context, index) => LocationList(
-                location: placePredictions[index].description!,
-                press: () async {
-                  String selectedAddress = placePredictions[index].description!;
-                  LatLng? latLng = await getLatLng(selectedAddress);
-                  widget.onSelectedLocation(latLng);
-                  widget.controller.text = selectedAddress; // update the text field with the selected address
-                  print('Selected place: $selectedAddress, Coordinates: $latLng');
-                }
-            ),
-          ),
+
+    final locationList = Container(
+      constraints: const BoxConstraints(maxHeight: 180),
+      child: ListView.builder(
+        padding: widget.top ? const EdgeInsets.only(top: 2) : null,
+        shrinkWrap: true,
+        itemCount: placePredictions.length,
+        itemBuilder: (context, index) => LocationListItem(
+            location: placePredictions[index].description!,
+            press: () async {
+              setState(() {
+                outFocus = true;
+              });
+              FocusScope.of(context).unfocus();
+              String selectedAddress = placePredictions[index].description!;
+              LatLng? latLng = await getLatLng(selectedAddress);
+              widget.onSelectedLocation(latLng);
+              widget.controller.text = selectedAddress; // update the text field with the selected address
+              print('Selected place: $selectedAddress, Coordinates: $latLng');
+            }
         ),
+      ),
+    );
+
+
+    return Column(children: [
+      if (widget.top && !outFocus)
+        locationList,
       Form(
         child: Padding(
           padding: EdgeInsets.all(widget.padding),
@@ -129,24 +163,8 @@ class _SearchLocationState extends State<SearchLocation> {
           ),
         ),
       ),
-      if (!widget.top && placePredictions.isNotEmpty)
-        Container(
-          constraints: BoxConstraints(maxHeight: 180),
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: placePredictions.length,
-            itemBuilder: (context, index) => LocationList(
-                location: placePredictions[index].description!,
-                press: () async {
-                  String selectedAddress = placePredictions[index].description!;
-                  LatLng? latLng = await getLatLng(selectedAddress);
-                  widget.onSelectedLocation(latLng);
-                  widget.controller.text = selectedAddress; // update the text field with the selected address
-                  print('Selected place: $selectedAddress, Coordinates: $latLng');
-                }
-            ),
-          ),
-        ),
+      if (!widget.top && !outFocus)
+        locationList
     ]);
   }
 }
