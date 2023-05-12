@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_upload/models/displayed_ecospot.dart';
@@ -109,6 +110,9 @@ class _MarkedMapState extends State<MarkedMap> {
                     markers: Set<Marker>.of(widget.markers),
                     onMapCreated: (GoogleMapController controller) {
                       _controller.complete(controller);
+                      rootBundle.loadString('map_assets/map_style.txt').then((string) {
+                        controller.setMapStyle(string);
+                      });
                     },
                   );
                 }
