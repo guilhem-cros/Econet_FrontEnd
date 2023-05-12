@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class LocationList extends StatelessWidget {
+class LocationListItem extends StatelessWidget {
   final String location;
   final VoidCallback press;
 
-  const LocationList({
+  const LocationListItem({
     Key? key,
     required this.location,
     required this.press,
@@ -15,7 +15,7 @@ class LocationList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width:  0.65*MediaQuery.of(context).size.width,
-      padding: EdgeInsets.only(left: 10, top: 0),
+      padding: const EdgeInsets.only(left: 10, top: 0),
       child:  Column(
         children: [
           ListTile(

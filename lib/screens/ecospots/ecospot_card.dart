@@ -175,6 +175,10 @@ class _EcospotCardState extends State<EcospotCard> {
         )
     );
 
+    void closeCard(){
+      Navigator.pop(context, false);
+    }
+
     final buttonsBox = Column(
       children: [
         const SizedBox(height: 15),
@@ -200,6 +204,7 @@ class _EcospotCardState extends State<EcospotCard> {
                   fetchOtherTypes(ecospot.otherTypes);
                   widget.onUpdate(updatedItem);
                   }
+                closeCard();
               },
               icon: const Icon(Icons.edit_outlined, color: Colors.white),
               iconColor: Colors.white,
@@ -227,7 +232,7 @@ class _EcospotCardState extends State<EcospotCard> {
                   children: [
                     Row(
                         children: [
-                          SizedBox(width: 45,),  // Vous pouvez ajuster la valeur pour obtenir le centrage désiré
+                          const SizedBox(width: 45,),  // Vous pouvez ajuster la valeur pour obtenir le centrage désiré
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -238,7 +243,7 @@ class _EcospotCardState extends State<EcospotCard> {
                                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, fontFamily: 'FiraSans'),
                                   textAlign: TextAlign.center,
                                 ),
-                                SizedBox(height: 2.0), // Ajustez cette valeur pour rapprocher ou éloigner les textes
+                                const SizedBox(height: 2.0), // Ajustez cette valeur pour rapprocher ou éloigner les textes
                                 Text(
                                   ecospot.mainType.name,
                                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300, fontFamily: 'FiraSans'),
@@ -317,7 +322,7 @@ class _EcospotCardState extends State<EcospotCard> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(15)), // arrondir l'image
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(15)), // arrondir l'image
                     child: Image.network(ecospot.pictureUrl, width: MediaQuery.of(context).size.width, height: 180, fit: BoxFit.fitWidth),
                   ),
                   ecospotDetails
