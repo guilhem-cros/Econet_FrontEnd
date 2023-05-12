@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_upload/utils/extensions.dart';
 
@@ -34,5 +36,10 @@ class NetworkUtility{
     } else {
       throw Exception('Failed to get address');
     }
+  }
+
+  static Future<LatLng> getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return LatLng(position.latitude, position.longitude);
   }
 }
