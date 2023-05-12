@@ -13,8 +13,9 @@ class MapBar extends StatefulWidget{
   final List<EcospotModel> currentEcospotsList;
   final List<EcospotModel> allEcospots;
   final void Function(List<EcospotModel>) updateList;
+  final void Function(LatLng?) onSearch;
 
-  const MapBar({super.key, required this.currentEcospotsList, required this.allEcospots, required this.updateList});
+  const MapBar({super.key, required this.currentEcospotsList, required this.allEcospots, required this.updateList, required this.onSearch});
 
   @override
   State<MapBar> createState() => _MapBarState();
@@ -162,7 +163,7 @@ class _MapBarState extends State<MapBar>{
                       contentPadding: const EdgeInsets.all(0),
                     ),top: true,
                       onSelectedLocation: (LatLng? latLng) {
-                        print(latLng);
+                        widget.onSearch(latLng);
                       },
                     controller: _searchController,
                     padding: 8,

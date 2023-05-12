@@ -26,13 +26,31 @@ class _Home extends State<Home>{
   late int _reloadCount;
   final ClientDAO clientDAO = ClientDAO();
   final EcospotDAO ecospotDAO = EcospotDAO();
+  List<EcospotModel>? listToSend;
+  String errMsg="";
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  GlobalKey<RefreshIndicatorState>();
+
+
+  Future<void> _reloadData() async {
+    final response = await ecospotDAO.getPublishedEcoSpots();
+    setState(() {
+      if (!response.error) {
+        listToSend = response.data;
+      } else {
+        errMsg = response.errorMessage ?? "Unknown error";
+      }
+    });
+    return;
+  }
 
   @override
   void initState() {
     super.initState();
     _clientModel = clientDAO.getByFirebaseId( uid: widget.firebaseId);
     _reloadCount = 0;
-    ecospots = ecospotDAO.getPublishedEcoSpots();
+    _reloadData();
   }
   
   void setCurrentClient(ClientModel clientModel){
@@ -49,28 +67,19 @@ class _Home extends State<Home>{
   @override
   Widget build(BuildContext context) {
 
-    final ecospotLoading = FutureBuilder<APIResponse<List<EcospotModel>>>(
-        future: ecospots,
-        builder: (context,snapshot){
-          List<EcospotModel>? listToSend;
-          String errMsg = "";
-          if(snapshot.hasData){
-            if(!snapshot.data!.error){
-              listToSend = snapshot.data!.data!;
-            } else {
-              errMsg = snapshot.data!.errorMessage!;
-            }
-          } else if (snapshot.hasError){
-            errMsg = snapshot.error!.toString();
-          }
-          if(errMsg.isNotEmpty || listToSend != null){
-             return MapScreen(
-              ecospots: listToSend,
-              errMsg: errMsg
-             );
-          }
-          return const CircularProgressIndicator();
-        },
+    final ecospotLoading = RefreshIndicator(
+      key: _refreshIndicatorKey,
+      onRefresh: _reloadData,
+      child: listToSend != null
+          ? MapScreen(
+        ecospots: listToSend,
+        errMsg: errMsg,
+        reload: () async {
+          await _refreshIndicatorKey.currentState!.show();
+          return _reloadData();
+        }
+      )
+          : const Center(child: CircularProgressIndicator()),
     );
 
     return Scaffold(

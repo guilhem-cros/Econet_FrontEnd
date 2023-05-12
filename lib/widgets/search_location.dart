@@ -1,12 +1,9 @@
-import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_upload/utils/network_utility.dart';
 import 'package:image_upload/widgets/lists/location_list.dart';
-import 'package:http/http.dart' as http;
 
 
 import '../models/place_autocomplete_response.dart';
@@ -67,25 +64,11 @@ class _SearchLocationState extends State<SearchLocation> {
   }
 
   Future<LatLng> getLatLng(String address) async {
-    Uri uri = Uri.https(
-        "maps.googleapis.com",
-        '/maps/api/geocode/json',
-        {
-          "address": address,
-          "key": dotenv.env['API_KEY'],
-        }
-    );
-    final response = await http.get(uri);
-    if (response.statusCode == 200) {
-      Map<String, dynamic> responseJson = jsonDecode(response.body);
-      if (responseJson['status'] == 'OK') {
-        final location = responseJson['results'][0]['geometry']['location'];
-        final lat = location['lat'];
-        final lng = location['lng'];
-        return LatLng(lat, lng);
-      }
+    try {
+      return await NetworkUtility.getLatLng(address);
+    } catch (err){
+      rethrow; //TODO handle err
     }
-    throw Exception('Failed to get LatLng');
   }
 
   void placeAutocomplete(String query) async {

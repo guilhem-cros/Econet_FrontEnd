@@ -42,4 +42,26 @@ class NetworkUtility{
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     return LatLng(position.latitude, position.longitude);
   }
+
+  static Future<LatLng> getLatLng(String address) async {
+    Uri uri = Uri.https(
+        "maps.googleapis.com",
+        '/maps/api/geocode/json',
+        {
+          "address": address,
+          "key": dotenv.env['API_KEY'],
+        }
+    );
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseJson = jsonDecode(response.body);
+      if (responseJson['status'] == 'OK') {
+        final location = responseJson['results'][0]['geometry']['location'];
+        final lat = location['lat'];
+        final lng = location['lng'];
+        return LatLng(lat, lng);
+      }
+    }
+    throw Exception('Failed to get LatLng');
+  }
 }

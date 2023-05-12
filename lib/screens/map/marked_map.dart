@@ -16,8 +16,9 @@ class MarkedMap extends StatefulWidget {
   final List<Marker> markers;
   final Position? cameraPosition;
   final void Function() showSpot;
+  final LatLng? searchedLocation;
 
-  const MarkedMap({Key? key, required this.permission, required this.markers, this.cameraPosition, required this.showSpot}) : super(key: key);
+  const MarkedMap({Key? key, required this.permission, required this.markers, this.cameraPosition, required this.showSpot, this.searchedLocation}) : super(key: key);
 
   @override
   State<MarkedMap> createState() => _MarkedMapState();
@@ -59,6 +60,13 @@ class _MarkedMapState extends State<MarkedMap> {
     }
   }
 
+  void setCameraOnAddress(LatLng location) async {
+    final mapController = await _controller.future;
+    mapController.animateCamera(
+        CameraUpdate.newCameraPosition(CameraPosition(target: location, zoom: 15))
+    );
+  }
+
   CameraPosition getCamera(Position position) {
     return CameraPosition(
       target: LatLng(
@@ -90,6 +98,10 @@ class _MarkedMapState extends State<MarkedMap> {
       ),
       zoom: 15,
     );
+
+    if(widget.searchedLocation!=null && Provider.of<DisplayedEcospot>(context).value==null){
+      setCameraOnAddress(widget.searchedLocation!);
+    }
 
     return Stack(
         children: [
