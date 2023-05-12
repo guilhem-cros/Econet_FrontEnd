@@ -110,11 +110,11 @@ class _EcospotCardState extends State<EcospotCard> {
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'FiraSans'),
           ),
           Text(
             content,
-            style: const TextStyle(fontSize: 14),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w300, fontFamily: 'FiraSans'),
           ),
         ],
       ),
@@ -226,22 +226,31 @@ class _EcospotCardState extends State<EcospotCard> {
               Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const SizedBox(width: 45,),
-                        Text(
-                          ecospot.name,
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        IconButton(
-                          onPressed: setFav,
-                          icon: _isFav? const Icon(Icons.star,color: Color.fromRGBO(255, 230, 0, 1)) : const Icon(Icons.star_border),
-                        )
-                      ]
-                    ),
-                    Text(
-                      ecospot.mainType.name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+                        children: [
+                          SizedBox(width: 45,),  // Vous pouvez ajuster la valeur pour obtenir le centrage désiré
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 10,),
+                                Text(
+                                  ecospot.name,
+                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, fontFamily: 'FiraSans'),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 2.0), // Ajustez cette valeur pour rapprocher ou éloigner les textes
+                                Text(
+                                  ecospot.mainType.name,
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300, fontFamily: 'FiraSans'),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: setFav,
+                            icon: _isFav? const Icon(Icons.star,color: Color.fromRGBO(255, 230, 0, 1)) : const Icon(Icons.star_border),
+                          ),
+                        ]
                     ),
                   ]
               ),
@@ -268,35 +277,57 @@ class _EcospotCardState extends State<EcospotCard> {
 
 
     return Dialog(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             Container(
-            height: 0.7*MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black45,
-                  blurRadius: 15.0,
-
+              height: 0.7 * MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black45,
+                    blurRadius: 25.0, // augmenter le blur pour plus d'ombre
+                    spreadRadius: 5.0, // ajouter du spread pour plus de profondeur
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(15), // arrondir un peu plus les coins
+                gradient: LinearGradient( // Ajout du dégradé
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    HSLColor.fromColor(ecospot.mainType.color.toColor())
+                        .withSaturation(0.45) // baisser la saturation
+                        .withLightness(0.3) // augmenter la luminosité
+                        .toColor(),
+                    HSLColor.fromColor(ecospot.mainType.color.toColor())
+                        .withSaturation(0.65) // saturation plus élevée pour la deuxième couleur
+                        .withLightness(0.7) // luminosité plus élevée pour la deuxième couleur
+                        .toColor(),
+                  ],
                 ),
-              ],
-              borderRadius: BorderRadius.circular(3),
-              color: HSLColor.fromColor(ecospot.mainType.color.toColor()).withSaturation(0.65).withLightness(0.5).toColor(),
+                border: Border.all( // ajouter une bordure
+                  color: Colors.grey[300]!,
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(15)), // arrondir l'image
+                    child: Image.network(ecospot.pictureUrl, width: MediaQuery.of(context).size.width, height: 180, fit: BoxFit.fitWidth),
+                  ),
+                  ecospotDetails
+                ],
+              ),
             ),
-          child:
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.network(ecospot.pictureUrl,width: MediaQuery.of(context).size.width, height: 180, fit: BoxFit.fitWidth),
-                ecospotDetails
-              ]
-            ),
-          ),
-          buttonsBox
-        ]
-      )
+            buttonsBox
+          ],
+        ),
+      ),
     );
   }
 

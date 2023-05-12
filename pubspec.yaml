@@ -101,6 +101,12 @@ flutter:
   - family: Inter
     fonts:
       - asset: fonts/Inter.ttf
+  - family: FiraSans
+    fonts:
+      - asset: fonts/FiraSans-Black.ttf
+      - asset: fonts/FiraSans-Light.ttf
+      - asset: fonts/FiraSans-Regular.ttf
+      - asset: fonts/FiraSans-SemiBold.ttf
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
