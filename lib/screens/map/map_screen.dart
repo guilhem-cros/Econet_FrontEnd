@@ -25,8 +25,9 @@ class MapScreen extends StatefulWidget {
 
   final List<EcospotModel>? ecospots;
   final String errMsg;
+  final Future<void> Function() reload;
 
-  const MapScreen({super.key, this.ecospots, this.errMsg = ""});
+  const MapScreen({super.key, this.ecospots, this.errMsg = "", required this.reload});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -41,6 +42,7 @@ class _MapScreenState extends State<MapScreen> {
 
   final List<Marker> _markers = [];
   Map<String, BitmapDescriptor> loadedUrl = {};
+  LatLng? searchedLocation;
 
   void showError(BuildContext context){
     showDialog(
@@ -163,6 +165,9 @@ class _MapScreenState extends State<MapScreen> {
         },
     ).then((value){
       if(value){
+        setState(() {
+          searchedLocation = null;
+        });
         Provider.of<DisplayedEcospot>(context, listen: false).value=null;
       }
     });
@@ -255,16 +260,16 @@ class _MapScreenState extends State<MapScreen> {
                       if (snapshot.hasData) {
                         if (snapshot.data! == LocationPermission.whileInUse ||
                             snapshot.data! == LocationPermission.always) {
-                          return MarkedMap(permission: snapshot.data!, markers: _markers, showSpot: showSpotInfo,);
+                          return MarkedMap(permission: snapshot.data!, markers: _markers, showSpot: showSpotInfo, searchedLocation: searchedLocation,);
                         } else {
                           return FutureBuilder<LocationPermission>(
                               future: requestPermission(),
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
-                                  return MarkedMap(permission: snapshot.data!, markers: _markers,showSpot: showSpotInfo);
+                                  return MarkedMap(permission: snapshot.data!, markers: _markers,showSpot: showSpotInfo, searchedLocation: searchedLocation);
                                 } else if (snapshot.hasError) {
                                   return MarkedMap(
-                                      permission: LocationPermission.denied, markers: _markers,showSpot: showSpotInfo);
+                                      permission: LocationPermission.denied, markers: _markers,showSpot: showSpotInfo, searchedLocation: searchedLocation);
                                 }
                                 else {
                                   return const Center(
@@ -278,12 +283,13 @@ class _MapScreenState extends State<MapScreen> {
                             future: requestPermission(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
-                                return MarkedMap(permission: snapshot.data!, markers: _markers, showSpot: showSpotInfo,);
+                                return MarkedMap(permission: snapshot.data!, markers: _markers, showSpot: showSpotInfo, searchedLocation: searchedLocation);
                               } else if (snapshot.hasError) {
                                 return MarkedMap(
                                   permission: LocationPermission.denied,
                                   markers: _markers,
-                                  showSpot: showSpotInfo
+                                  showSpot: showSpotInfo,
+                                  searchedLocation: searchedLocation
                                 );
                               }
                               else {
@@ -316,10 +322,29 @@ class _MapScreenState extends State<MapScreen> {
                 displayedEcospots = updatedList;
                 fillMarkers();
               });
-            }
+            },
+            onSearch: (LatLng? latlgn){
+              setState(() {
+                searchedLocation = latlgn;
+              });
+            },
           ),)
         ]
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await widget.reload();
+          setState(() {
+            displayedEcospots = widget.ecospots == null ? [] : widget.ecospots!;
+            fillMarkers();
+            if(widget.errMsg.isNotEmpty){
+              showError(context);
+            }
+          });
+        },
+        child: const Icon(Icons.refresh)
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
     );
   }
 }
