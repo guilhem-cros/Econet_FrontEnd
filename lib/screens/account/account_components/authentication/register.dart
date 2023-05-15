@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/widgets/wave.dart';
 
-import '../forms/register_form.dart';
+import '../generalized_client_form.dart';
 
+/// Widget handling the registration of a client
 class Register extends StatefulWidget{
 
+  /// Function called when the login link is clicked
   final Function? toggleView;
-  Register({this.toggleView});
+
+  const Register({super.key, this.toggleView});
 
   @override
   State<StatefulWidget> createState() {
@@ -22,7 +25,7 @@ class _Register extends State<Register>{
     return Scaffold(
       body: Stack(
         children: [
-          RegisterForm(
+          GeneralizedClientForm(
             onToggleView: widget.toggleView,
           ),
           Wave(0.25, 0.6, 0.75, positionTop: 0, positionLeft: 0, positionRight: 0,

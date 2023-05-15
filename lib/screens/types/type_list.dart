@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_upload/screens/types/type_form.dart';
-import 'package:image_upload/widgets/lists/type_list.dart';
+import 'package:image_upload/screens/types/types_components/type_list_builder/type_list_builder.dart';
 
 import '../../DAOs/type_DAO.dart';
 import '../../models/api_response.dart';
@@ -75,7 +74,7 @@ class TypeListState extends State<TypeListScreen>{
                       return ErrorScreen(errorMessage: snapshot.data!.errorMessage!);
                     } else {
                       setTypeList(snapshot.data!.data!);
-                      return Expanded(child: TypeList(typeList: widget.listType));
+                      return Expanded(child: TypeListBuilder(typeList: widget.listType));
                     }
                   } else if (snapshot.hasError){
                     return ErrorScreen(errorMessage: snapshot.error.toString());

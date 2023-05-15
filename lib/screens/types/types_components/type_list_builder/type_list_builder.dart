@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:image_upload/models/type.dart';
 import 'package:image_upload/screens/types/type_form.dart';
+import 'package:image_upload/screens/types/types_components/type_list_builder/type_list_item.dart';
 import 'package:image_upload/utils/extensions.dart';
-import 'package:image_upload/widgets/type_list_item.dart';
 
-import '../../models/type.dart';
-
-class TypeList extends StatefulWidget {
+class TypeListBuilder extends StatefulWidget {
 
   final List<TypeModel> typeList;
 
-  const TypeList({super.key, required this.typeList});
+  const TypeListBuilder({super.key, required this.typeList});
 
   @override
   State<StatefulWidget> createState() {
-    return TypeListState();
+    return TypeListBuilderState();
   }
 
 }
 
-class TypeListState extends State<TypeList> {
+class TypeListBuilderState extends State<TypeListBuilder> {
 
   late List<TypeModel> _copyList;
   final TextEditingController _searchController = TextEditingController();

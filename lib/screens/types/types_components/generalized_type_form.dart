@@ -10,8 +10,8 @@ import 'package:image_upload/services/storage_service.dart';
 import 'package:image_upload/utils/extensions.dart';
 
 
-import '../../DAOs/type_DAO.dart';
-import '../../widgets/image_picker.dart';
+import '../../../DAOs/type_DAO.dart';
+import '../../../widgets/image_picker.dart';
 
 class TypeForm extends StatefulWidget {
   final TypeModel? toUpdateType;

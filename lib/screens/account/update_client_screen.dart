@@ -4,14 +4,16 @@ import 'dart:math' as math;
 
 import '../../widgets/custom_buttons/back_button.dart';
 import '../../widgets/wave.dart';
-import '../forms/register_form.dart';
+import 'account_components/generalized_client_form.dart';
 import '../home/home.dart';
 
-class UpdateClientForm extends StatelessWidget {
+/// Screen handling the update of the currently connected client
+class UpdateClientScreen extends StatelessWidget {
 
+  /// Function to call after updating the client
   final void Function() onSubmit;
 
-  const UpdateClientForm({super.key, required this.onSubmit});
+  const UpdateClientScreen({super.key, required this.onSubmit});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class UpdateClientForm extends StatelessWidget {
                 child:const Text("Modifier mon compte",style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
               )],
             ),
-            Expanded(child: RegisterForm(
+            Expanded(child: GeneralizedClientForm(
               toUpdateClient: Home.currentClient!,
               onSubmit: onSubmit,
             )),

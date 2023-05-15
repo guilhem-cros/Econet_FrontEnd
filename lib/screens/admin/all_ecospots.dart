@@ -1,14 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_upload/screens/ecospots_lists/ecospots_list.dart';
+import 'package:image_upload/screens/ecospots/ecospots_list.dart';
 
 import '../../DAOs/ecospot_DAO.dart';
 import '../../models/ecospot.dart';
 import '../../models/api_response.dart';
 import '../error/error_screen.dart';
 
+/// Screen containing the list of every ecospots available in the DB
 class AllEcospotsListScreen extends StatefulWidget{
 
+  /// List containing every ecospots
   late List<EcospotModel> listEcospots ;
 
   AllEcospotsListScreen({super.key});
@@ -20,7 +22,10 @@ class AllEcospotsListScreen extends StatefulWidget{
 }
 
 class AllEcospotsListState extends State<AllEcospotsListScreen>{
+
+  /// Result of the getAllEcospot call on the API
   late Future<APIResponse<List<EcospotModel>>> _result;
+
   final ecospotDAO = EcospotDAO();
 
   @override

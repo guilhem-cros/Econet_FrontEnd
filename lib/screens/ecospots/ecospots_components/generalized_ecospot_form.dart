@@ -5,20 +5,19 @@ import 'package:image_upload/models/ecospot.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/utils/extensions.dart';
 import 'package:image_upload/widgets/image_picker.dart';
-import '../../DAOs/ecospot_DAO.dart';
-import '../../screens/home/home.dart';
-import '../../services/storage_service.dart';
+import '../../../DAOs/ecospot_DAO.dart';
+import '../../home/home.dart';
+import '../../../services/storage_service.dart';
 import 'package:collection/collection.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:image_upload/utils/extensions.dart';
 
 
-import '../../DAOs/type_DAO.dart';
-import '../../models/type.dart';
-import '../../utils/network_utility.dart';
-import '../../widgets/custom_buttons/icon_button.dart';
-import '../../widgets/search_location.dart';
-import '../error/error_screen.dart';
+import '../../../DAOs/type_DAO.dart';
+import '../../../models/type.dart';
+import '../../../utils/network_utility.dart';
+import '../../../widgets/custom_buttons/icon_button.dart';
+import '../../../widgets/location_research/search_location.dart';
+import '../../error/error_screen.dart';
 
 class EcospotForm extends StatefulWidget{
   late List<TypeModel>? typeList;
@@ -49,7 +48,6 @@ class _EcospotForm  extends State<EcospotForm>{
 
   final GlobalKey<FormFieldState> _addressFieldKey = GlobalKey<FormFieldState>();
   List<String> _suggestedAddresses = [];
-  LatLng? _location;
 
 
   late bool _isUploading;

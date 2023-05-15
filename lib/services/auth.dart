@@ -3,8 +3,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_upload/DAOs/client_DAO.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/client.dart';
+import 'package:image_upload/services/DTOs/loginuser_dto.dart';
 import '../models/firebaseuser.dart';
-import '../screens/authenticate/DTOs/loginuser_dto.dart';
 
 /// Class handling authentication via firebase
 class AuthService {

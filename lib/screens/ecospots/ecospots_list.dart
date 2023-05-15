@@ -3,12 +3,12 @@ import 'package:image_upload/DAOs/type_DAO.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/screens/ecospots/ecospot_form.dart';
 import 'package:image_upload/widgets/custom_buttons/back_button.dart';
-import 'package:image_upload/widgets/lists/ecospots_list.dart';
 
 import '../../models/ecospot.dart';
 import '../../models/type.dart';
 import '../error/error_screen.dart';
 import '../home/home.dart';
+import 'ecospots_components/ecospot_list_builder/ecospots_list_builder.dart';
 
 class EcospotsListScreen extends StatefulWidget{
 
@@ -86,7 +86,7 @@ class EcospotsListScreenState extends State<EcospotsListScreen>{
                           Icons.add, color: Color.fromRGBO(81, 129, 253, 1),))
                     ],
                   ),
-                  Expanded(child: EcospotsList(
+                  Expanded(child: EcospotsListBuilder(
                     ecospotsList: widget.ecospotsList,
                     typeList: widget.listType,
                     isPublicationList: widget.isPublicationList,

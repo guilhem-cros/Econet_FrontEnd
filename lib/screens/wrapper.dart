@@ -3,7 +3,7 @@ import '../models/firebaseuser.dart';
 import '../screens/home/home.dart';
 import 'package:flutter/material.dart';
 
-import 'authenticate/handler.dart';
+import 'account/handler_auth_screen.dart';
 
 class Wrapper extends StatelessWidget{
 

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_upload/screens/admin/all_ecospots.dart';
-import 'package:image_upload/screens/admin/type_list.dart';
+import 'package:image_upload/screens/types/type_list.dart';
 import 'package:image_upload/screens/admin/unpublished_ecospots.dart';
 import 'package:image_upload/widgets/menu_item.dart';
 import 'dart:math' as math;
@@ -9,6 +9,7 @@ import 'dart:math' as math;
 import '../../widgets/custom_buttons/back_button.dart';
 import '../../widgets/wave.dart';
 
+/// Screen corresponding to the admin menu page
 class AdminMenu extends StatelessWidget{
 
   const AdminMenu({super.key});

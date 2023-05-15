@@ -4,15 +4,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_upload/utils/network_utility.dart';
-import 'package:image_upload/widgets/lists/location_list_item.dart';
+import 'package:image_upload/widgets/location_research/location_list_item.dart';
 
-
-
-
-
-
-import '../models/place_autocomplete_response.dart';
-import '../models/autocomplete_prediction.dart';
+import 'models/place_autocomplete_response.dart';
+import 'models/autocomplete_prediction.dart';
 
 class SearchLocation extends StatefulWidget {
   final bool top;

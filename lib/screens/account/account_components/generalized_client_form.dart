@@ -1,23 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/client.dart';
-import 'package:image_upload/screens/authenticate/DTOs/loginuser_dto.dart';
+import 'package:image_upload/services/DTOs/loginuser_dto.dart';
 import 'package:image_upload/services/auth.dart';
-import '../../DAOs/client_DAO.dart';
-import '../../screens/home/home.dart';
+import '../../../DAOs/client_DAO.dart';
+import '../../home/home.dart';
 
-class RegisterForm extends StatefulWidget {
+/// Generalized form handling creation and updated of a Client
+class GeneralizedClientForm extends StatefulWidget {
+
+  /// Client object to update, used to prefill the form
+  /// null if the form concerns a creation
   final ClientModel? toUpdateClient;
+  /// Function called when the login link is clicked
   final Function? onToggleView;
+  /// function to call after the form has been submitted
   final Function? onSubmit;
 
-  const RegisterForm({super.key, this.onToggleView, this.toUpdateClient, this.onSubmit});
+  const GeneralizedClientForm({super.key, this.onToggleView, this.toUpdateClient, this.onSubmit});
 
   @override
-  _RegisterFormState createState() => _RegisterFormState();
+  _GeneralizedClientFormState createState() => _GeneralizedClientFormState();
 }
 
-class _RegisterFormState extends State<RegisterForm> {
+class _GeneralizedClientFormState extends State<GeneralizedClientForm> {
   final AuthService _auth = AuthService();
   final clientDAO = ClientDAO();
   bool _obscureText = true;
@@ -28,7 +34,9 @@ class _RegisterFormState extends State<RegisterForm> {
   TextEditingController _pseudo = TextEditingController();
   final TextEditingController _currentPW = TextEditingController();
 
+  /// true if the form concerns a creation, false if not
   bool creation = false;
+  /// true if the form is currently submitting data, false if not
   bool isUpdating = false;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -44,6 +52,7 @@ class _RegisterFormState extends State<RegisterForm> {
     }
   }
 
+  /// Close the form and show a notification about the success of the submit
   void submitted(bool updated){
     if(mounted) {
       setState(() {
@@ -70,6 +79,7 @@ class _RegisterFormState extends State<RegisterForm> {
     }
   }
 
+  /// Open an informative popup
   void showPopUp(BuildContext context, String message){
     showDialog(
       context: context,
@@ -84,6 +94,7 @@ class _RegisterFormState extends State<RegisterForm> {
   @override
   Widget build(BuildContext context) {
 
+    /// TextField concerning the name of the Client
     final fullNameField = TextFormField(
         controller: _fullName,
         autofocus: false,
@@ -106,6 +117,7 @@ class _RegisterFormState extends State<RegisterForm> {
             border:
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none )));
 
+    /// TextField concerning the pseudo of the client
     final pseudoField = TextFormField(
         controller: _pseudo,
         autofocus: false,
@@ -128,6 +140,7 @@ class _RegisterFormState extends State<RegisterForm> {
             border:
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
 
+    /// TextField concerning the email of the Client
     final emailField = TextFormField(
         controller: _email,
         autofocus: false,
@@ -152,6 +165,8 @@ class _RegisterFormState extends State<RegisterForm> {
             border:
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
 
+    /// TextField concerning the password
+    /// Concerns new password in case of update
     final passwordField = TextFormField(
         obscureText: _obscureText,
         controller: _password,
@@ -186,6 +201,8 @@ class _RegisterFormState extends State<RegisterForm> {
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
 
 
+    /// TextField concerning the password confirmation
+    /// Concerns the old password in case of update
     final confirmPasswordField = TextFormField(
       controller: creation? null : _currentPW,
       obscureText: _obscureTextConfirm,
@@ -231,6 +248,7 @@ class _RegisterFormState extends State<RegisterForm> {
         style: TextButton.styleFrom(foregroundColor: Colors.black,textStyle: const TextStyle(decoration: TextDecoration.underline)),
         child: const Text('Revenir à la connexion',style: TextStyle(fontSize: 15)));
 
+    /// Submit button handling the creation and update
     final registerButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
@@ -241,10 +259,12 @@ class _RegisterFormState extends State<RegisterForm> {
         onPressed: () async {
 
           setState(() {
-            isUpdating = true;
+            isUpdating = true; // has submitted -> showing the CircularProgressIndicator
           });
 
-          if (_formKey.currentState!.validate()) {
+          if (_formKey.currentState!.validate()) { // if every necessary field has been filled
+
+            // checking email and pseudo are unique
             final checkResult = creation ?
             await clientDAO.checkEmailPseudoUnique(
               email: _email.text,
@@ -258,19 +278,19 @@ class _RegisterFormState extends State<RegisterForm> {
             );
 
             if (!checkResult.error) {
-              if (!checkResult.data!['isUnique']) {
-                showPopUp(context, checkResult.data!['errorMessage']);
-                submitted(false);
+              if (!checkResult.data!['isUnique']) { //email or pseudo not unique
+                showPopUp(context, checkResult.data!['errorMessage']); // showing an info msg
+                submitted(false); // hiding the progress indicator
               }
-              else {
+              else { // email and pseudo unique
 
-                if (creation) {
+                if (creation) { //creation form
                   try {
                     await _auth.registerEmailPassword(
                       LoginUser(email: _email.text, password: _password.text),
                       _fullName.text,
                       _pseudo.text,
-                    );
+                    ); // registering th user into firebase and then into the database
                     submitted(true);
                   } catch (err) {
                     showPopUp(context, err.toString());
@@ -278,16 +298,16 @@ class _RegisterFormState extends State<RegisterForm> {
                   }
                 }
 
-                else {
+                else { // update form
                   dynamic testPW = await _auth.signInEmailPassword(LoginUser(
                       email: widget.toUpdateClient!.email,
                       password: _currentPW.text
                   ));
-                  if (testPW.uid == null) {
+                  if (testPW.uid == null) { // old password and email doesn't match
                     showPopUp(context, testPW.code);
                     submitted(false);
-                  } else {
-                    if (_email.text != widget.toUpdateClient!.email) {
+                  } else { // old password and email match
+                    if (_email.text != widget.toUpdateClient!.email) { //if updating mail
                       try {
                         await _auth.updateEmail(LoginUser(
                             email: widget.toUpdateClient!.email,
@@ -299,7 +319,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       }
                     }
                     if (_password.text.isNotEmpty &&
-                        _password.text != _currentPW.text) {
+                        _password.text != _currentPW.text) { // if updating password
                       try {
                         await _auth.updatePassword(LoginUser(
                             email: widget.toUpdateClient!.email,
@@ -313,7 +333,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     Home.currentClient!.fullName = _fullName.text;
                     APIResponse<ClientModel> result = await clientDAO
                         .updateClient(
-                        updateClient: Home.currentClient!);
+                        updateClient: Home.currentClient!); //updating client into DB
                     if (result.error) {
                       showPopUp(context, result.errorMessage!);
                       submitted(false);
@@ -334,7 +354,7 @@ class _RegisterFormState extends State<RegisterForm> {
             submitted(false);
           }
         },
-        child: isUpdating ?
+        child: isUpdating ? // showing a progress indicator if currently submitting data
         const SizedBox(height: 20, width: 20 ,child: CircularProgressIndicator()) :
         Text( creation ?
           "Inscription" : "Enregistrer",
