@@ -15,6 +15,13 @@ class ClientDAO {
   /// Need the full_name, the pseudo, the email and the firebaseId of the client
   /// Return an APIResponse of a ClientModel, containing the created client if no everything
   /// worked, an error message if not
+  ///
+  /// Parameters:
+  /// - fullName: string -> the complete name of the client
+  /// - pseudo: string -> the pseudo of the client
+  /// - email: string -> the email of the client
+  /// - firebaseId: string -> during the creation of a client, we use Firebase services to authenticate
+  /// the client : the firebaseId corresponds to a unique identifier for each client
   Future<APIResponse<ClientModel>> createClient({
     required String fullName,
     required String pseudo,
@@ -52,6 +59,10 @@ class ClientDAO {
   /// Check if a specified string doesn't match any existing email or pseudo in the DB
   /// Return an APIResponse containing the result of the request if no error
   /// An APIResponse containing an error message if not
+  ///
+  /// Parameters:
+  /// - email: string -> the string corresponding to the email to verify
+  /// - pseudo: string -> the string corresponding to the pseudo to verify
   Future<APIResponse<Map<String, dynamic>>> checkEmailPseudoUnique({
     required String email,
     required String pseudo,
@@ -83,6 +94,11 @@ class ClientDAO {
   /// but the one of the client linked to the specified id
   /// Return an APIResponse containing the result of the request if no error
   /// An APIResponse containing an error message if not
+  ///
+  /// Parameters:
+  /// - email: string -> the string corresponding to the email to verify
+  /// - pseudo: string -> the string corresponding to the pseudo to verify
+  /// - id: string -> the id of the client in the database
   Future<APIResponse<Map<String, dynamic>>> checkEmailPseudoUniqueForUpdate({
     required String email,
     required String pseudo,
@@ -115,6 +131,9 @@ class ClientDAO {
   /// Get a client by its firebaseId from the DB
   /// Return an APIResponse of a clientModel containing the matched client if the request worked
   /// An APIResponse containing an error message if not
+  ///
+  /// Parameters:
+  /// - uid: string -> the firebaseId of the client for who we need more information
   Future<APIResponse<ClientModel>> getByFirebaseId({required String uid}) async{
     final String apiUrl = Constants.baseUrl + Constants.clientEndpoint + Constants.firebaseEndpoint + uid;
 
@@ -145,6 +164,9 @@ class ClientDAO {
   /// Get a client by its id from the DB
   /// Return an APIResponse of a clientModel containing the matched client if the request worked
   /// An APIResponse containing an error message if not
+  ///
+  /// Parameters:
+  /// - id: string -> the id of the client for who we need more information
   Future<APIResponse<ClientModel>> getById({required String id}) async{
     final String apiUrl = '${Constants.baseUrl}${Constants.clientEndpoint}/$id';
 
@@ -176,6 +198,10 @@ class ClientDAO {
   /// Update the specified client in the database
   /// Return an APIResponse containing the just updated client if request worked
   /// An APIResponse containing an error message if not
+  ///
+  /// Parameters:
+  /// - updateClient: ClientModel -> a Client object containing the different
+  /// information to update
   Future<APIResponse<ClientModel>> updateClient({
     required ClientModel updateClient,
   }) async {

@@ -6,14 +6,17 @@ import 'package:http/http.dart' as http;
 import '../services/auth.dart';
 import '../utils/constants.dart';
 
-/// Get all existing types from the DB
-/// Return an APIResponse of a list of TypeModel containing every type
-/// AN APIResponse containing an error if the request didn't work
+
 class TypeDAO{
 
   final AuthService _auth = AuthService();
 
-
+  /// Get a type by its id from the DB
+  /// Return an APIResponse of a TypeModel containing the matched type if the request worked
+  /// An APIResponse containing an error message if not
+  ///
+  /// Parameters:
+  /// - id: string -> the id of the type for which we need more information
   Future<APIResponse<TypeModel>> getById({required String id}) async {
     final String apiUrl = "${Constants.baseUrl}${Constants.typeEndpoint}/$id";
 
@@ -42,6 +45,9 @@ class TypeDAO{
   }
 
 
+  /// Get all the types
+  /// Return an APIResponse of a List<TypeModel> containing the list of types if the request worked
+  /// An APIResponse containing an error message if not
   Future<APIResponse<List<TypeModel>>> getAll() async{
     final String apiUrl = Constants.baseUrl + Constants.typeEndpoint;
 
@@ -73,6 +79,10 @@ class TypeDAO{
   /// Check if a name and color is already taken by another type in DB
   /// If its the case returns false
   /// If not returns true
+  ///
+  /// Parameters:
+  /// - name: string -> the string corresponding to the type's name to verify
+  /// - color: string -> the string corresponding to the type's color to verify
   Future<APIResponse<bool>> isTypeUnique({
     required String name,
     required String color,
@@ -99,6 +109,12 @@ class TypeDAO{
   /// Tries to create a type into the DB
   /// Return the ApiResponse containing the type if sucess
   /// An APIResponse containing an error if not
+  ///
+  /// Parameters:
+  /// - name: string -> the name of the type
+  /// - color: string -> the color of the type (hex format)
+  /// - description: string -> the description of the type
+  /// - logoUrl: string -> the url of the logo representing the type
   Future<APIResponse<TypeModel>> create({
     required String name,
     required String color,
@@ -140,6 +156,14 @@ class TypeDAO{
   /// Updates a type by its id into the DB
   /// Return the updated type in an APIResponse
   /// Return an error message in an APIResponse if an error occurs during operation
+  ///
+  /// Parameters:
+  /// - id: string -> the id of the type to update
+  /// - name: string -> the new name of the type
+  /// - color: string -> the new color of the type (hex format)
+  /// - description: string -> the new description of the type
+  /// - logoUrl: string -> the new url of the logo representing the type
+  /// - associatedSpots: List<String> -> a list of the ecospots' ids associated to this new type (empty list by default)
   Future<APIResponse<TypeModel>> update({
     required String id,
     required String name,
