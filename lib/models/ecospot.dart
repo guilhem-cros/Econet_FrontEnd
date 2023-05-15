@@ -12,7 +12,9 @@ List<EcospotModel> ecospotListFromJson(String str) => List<EcospotModel>.from(js
 
 String ecospotListToJson(List<EcospotModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
+/// A model representing an ecospot based on the representation in the DB.
 class EcospotModel {
+
   EcospotModel({
     required this.id,
     required this.name,
@@ -25,14 +27,23 @@ class EcospotModel {
     required this.isPublished,
   });
 
+  ///The id of the ecospot in the DB
   String id;
+  ///The name of the ecospot
   String name;
+  ///The address of the ecospot ("Lattitude;Longitude")
   String address;
+  ///The details concerning the ecospot
   String details;
+  ///The tips concerning the ecospot
   String tips;
+  ///The url of the picture associated to the ecospot
   String pictureUrl;
+  ///The id of the Type object linked to the ecospot
   MainType mainType;
+  ///A list containing the ids of the the others Type objects linked to the ecospot
   List<String> otherTypes;
+  ///A boolean which indicates if the ecospot is directly visible by all the clients
   bool isPublished;
 
   factory EcospotModel.fromJson(Map<String, dynamic> json) => EcospotModel(

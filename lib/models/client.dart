@@ -10,7 +10,9 @@ ClientModel clientModelFromJson(String str) => ClientModel.fromJson(json.decode(
 
 String clientModelToJson(ClientModel data) => json.encode(data.toJson());
 
+/// A model representing a client based on the representation in the DB.
 class ClientModel {
+
   ClientModel({
     required this.id,
     required this.fullName,
@@ -25,16 +27,27 @@ class ClientModel {
     required this.createdEcospots,
   });
 
+  ///The id of the client in the DB
   String id;
+  ///The full name of the client
   String fullName;
+  ///The pseudo of the client
   String pseudo;
+  ///The email of the client
   String email;
+  ///The firebase identifier of the client
   String firebaseId;
+  ///Indicates if the client is an admin or not
   bool isAdmin;
+  ///The url of the profile picture of the client
   String profilePicUrl;
+  ///A list containing the ids of the favorites Articles of the client
   List<String> favArticles;
+  ///A list containing the ids of the different Publications created by the client
   List<String> createdPublications;
+  ///A list containing the ids of the favorites Ecospots of the client
   List<EcospotModel> favEcospots;
+  ///A list containing the ids of the different Ecospots created by the client
   List<EcospotModel> createdEcospots;
 
   factory ClientModel.fromJson(Map<String, dynamic> json) => ClientModel(

@@ -12,6 +12,7 @@ List<TypeModel> typeListFromJson(String str) => List<TypeModel>.from(json.decode
 
 String typeListToJson(List<TypeModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
+///A model representing a type based on the representation in the DB.
 class TypeModel {
   TypeModel({
     required this.id,
@@ -22,11 +23,17 @@ class TypeModel {
     required this.associatedSpots,
   });
 
+  ///The id of the type in the DB
   String id;
+  ///The name of the type
   String name;
+  ///The color associated to the type (hex format)
   String color;
+  ///The description of the type
   String description;
+  ///The url of the logo which represents the type
   String logoUrl;
+  ///A list of the ecospots' ids associated to the type
   List<String> associatedSpots;
 
   factory TypeModel.fromJson(Map<String, dynamic> json) => TypeModel(
