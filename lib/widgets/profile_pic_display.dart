@@ -2,9 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+/// Widget corresponding to the display of a profile pic
 class ProfilePicDisplay extends StatelessWidget {
 
+  /// Link to the profile pic
   final String profilePicUrl;
+  /// Function called when update button is pressed
   final VoidCallback onPressed;
 
   const ProfilePicDisplay({

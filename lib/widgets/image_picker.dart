@@ -15,9 +15,12 @@ class ImagePicker extends StatefulWidget {
   final String label;
   /// The function called after file selection
   final CallBackFunction setSelectedImage;
+  /// Height of the image preview
   double previewHeight;
+  /// Width of the image preview
   double previewWidth;
 
+  /// Url of an image to display before selecting one
   final String? currentImageURL;
 
   ImagePicker({

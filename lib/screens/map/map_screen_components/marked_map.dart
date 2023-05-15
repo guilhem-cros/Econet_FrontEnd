@@ -10,12 +10,18 @@ import 'package:provider/provider.dart';
 
 import '../../../models/ecospot.dart';
 
+/// Widget corresponding to the map with markers
 class MarkedMap extends StatefulWidget {
 
+  /// Permission given by the user on the localisation
   final LocationPermission permission;
+  /// List of markers to put on the map
   final List<Marker> markers;
+  /// Position of the camera on the map, the user location if null and authorized
   final Position? cameraPosition;
+  /// Function called when the currently displayed ecospot is changed and not null
   final void Function() showSpot;
+  /// Location searched in the searchBar
   final LatLng? searchedLocation;
 
   const MarkedMap({Key? key, required this.permission, required this.markers, this.cameraPosition, required this.showSpot, this.searchedLocation}) : super(key: key);
@@ -42,6 +48,7 @@ class _MarkedMapState extends State<MarkedMap> {
     }
   }
 
+  /// Called whenever the displayedEcospot is changed
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -49,6 +56,7 @@ class _MarkedMapState extends State<MarkedMap> {
     setCameraAndOpenPopup(_changeNotifier.value);
   }
 
+  /// Change the camera position and open an ecospot card
   void setCameraAndOpenPopup(EcospotModel? ecospot) async{
     if(ecospot!=null) {
       final mapController = await _controller.future;
@@ -60,6 +68,7 @@ class _MarkedMapState extends State<MarkedMap> {
     }
   }
 
+  /// Set camera of the map to a specified address
   void setCameraOnAddress(LatLng location) async {
     final mapController = await _controller.future;
     mapController.animateCamera(
@@ -91,6 +100,7 @@ class _MarkedMapState extends State<MarkedMap> {
   @override
   Widget build(BuildContext context) {
 
+    /// Basic camera position
     const CameraPosition kGooglePlex = CameraPosition(
       target: LatLng(
         50.610769,
@@ -99,6 +109,7 @@ class _MarkedMapState extends State<MarkedMap> {
       zoom: 15,
     );
 
+    // set camera to searched location
     if(widget.searchedLocation!=null && Provider.of<DisplayedEcospot>(context).value==null){
       setCameraOnAddress(widget.searchedLocation!);
     }

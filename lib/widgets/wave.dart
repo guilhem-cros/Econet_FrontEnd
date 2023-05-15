@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Widget building a custom green faded wave
 class BackgroundWaveClipper extends CustomClipper<Path> {
   final double p0coeff;
   final double controlPointCoeff;

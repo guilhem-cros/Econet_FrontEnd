@@ -9,8 +9,12 @@ import 'package:image_upload/widgets/location_research/location_list_item.dart';
 import 'models/place_autocomplete_response.dart';
 import 'models/autocomplete_prediction.dart';
 
+/// Widget handling the research of location using a string query
+/// and converting it to LatLng
 class SearchLocation extends StatefulWidget {
+  /// True if the result list has to be shown on top, false if not
   final bool top;
+  /// TextField decoration of the searchBar
   final InputDecoration decoration;
   final ValueChanged<LatLng?> onSelectedLocation;
   final FormFieldValidator<String>? validator;
@@ -88,7 +92,7 @@ class _SearchLocationState extends State<SearchLocation> {
     try {
       return await NetworkUtility.getLatLng(address);
     } catch (err){
-      rethrow; //TODO handle err
+      rethrow;
     }
   }
 

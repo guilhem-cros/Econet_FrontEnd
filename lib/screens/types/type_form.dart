@@ -4,8 +4,11 @@ import 'package:image_upload/screens/types/types_components/generalized_type_for
 
 import '../../widgets/custom_buttons/back_button.dart';
 
+/// Generalized type form screen
 class TypeFormScreen extends StatelessWidget{
 
+  /// Type to update if it's an update form.
+  /// Null if it's a creation
   final TypeModel? toUpdateType;
 
   const TypeFormScreen({super.key, this.toUpdateType});
@@ -13,6 +16,7 @@ class TypeFormScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
+    /// AppBar of the screen
     final appBar = AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,

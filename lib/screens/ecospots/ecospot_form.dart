@@ -6,9 +6,14 @@ import '../../widgets/custom_buttons/back_button.dart';
 import 'ecospots_components/generalized_ecospot_form.dart';
 import '../home/home.dart';
 
+/// Generalized screen concerning ecospot form
 class EcospotFormScreen extends StatelessWidget{
 
+  /// Ecospot to update if it's an update form.
+  /// Null if it's a creation
   final EcospotModel? toUpdateEcospot;
+  /// True if it's a form concerning the validation of a publication.
+  /// False if not
   final bool isPublicationForm;
 
   const EcospotFormScreen({super.key, this.toUpdateEcospot, this.isPublicationForm = false});
@@ -19,6 +24,7 @@ class EcospotFormScreen extends StatelessWidget{
 
     final dao = EcospotDAO();
 
+    /// Delete an ecospot to publish from the DB and show a confirmation message
     void deleteEcospot(){
       dao.delete(id: toUpdateEcospot!.id);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -41,6 +47,7 @@ class EcospotFormScreen extends StatelessWidget{
         },
     );
 
+    /// Dialog popup asking for confirmation to delete an ecospot
     void confirmDelete(){
       showDialog(
           context: context,
@@ -86,6 +93,7 @@ class EcospotFormScreen extends StatelessWidget{
   }
 }
 
+/// AppBar of the screen
 class _AppBar extends StatelessWidget with PreferredSizeWidget{
   @override
   final Size preferredSize = const Size.fromHeight(50.0);

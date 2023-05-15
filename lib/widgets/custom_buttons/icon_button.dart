@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 
+/// Customizable rounded icon button
 class CustomIconButton extends StatelessWidget {
 
+  /// Function called when button is pressed
   final void Function()? onPressed;
+  /// Icon of the button
   final Icon icon;
+  /// Background color of the button
   final Color backgroundColor;
+  /// Icon fill color
   final Color iconColor;
+  /// Border radius of the button
   final double radius;
+  /// Size on the button
   final double? size;
+  /// Stroke around the button, true or false
   final bool stroke;
 
   const CustomIconButton({super.key, required this.onPressed, required this.icon,

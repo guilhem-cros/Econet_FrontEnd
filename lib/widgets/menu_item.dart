@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 class MenuItem extends StatelessWidget{
 
+  /// Label of the item
   final String label;
+  /// Icon of the item
   final Icon icon;
+  /// Icon color of the item
   final Color iconColor;
+  /// Function called when the item is tapped
   final void Function()? onTap;
 
   const MenuItem({
