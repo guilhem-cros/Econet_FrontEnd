@@ -4,8 +4,10 @@ import 'package:image_upload/screens/types/type_form.dart';
 import 'package:image_upload/screens/types/types_components/type_list_builder/type_list_item.dart';
 import 'package:image_upload/utils/extensions.dart';
 
+/// Widget building a list of types
 class TypeListBuilder extends StatefulWidget {
 
+  /// The types displayed in the list
   final List<TypeModel> typeList;
 
   const TypeListBuilder({super.key, required this.typeList});
@@ -28,6 +30,7 @@ class TypeListBuilderState extends State<TypeListBuilder> {
     super.initState();
   }
 
+  /// Update the list with specified updated type
   void updateList(TypeModel updatedType){
     int index = widget.typeList.indexWhere((type) => type.id == updatedType.id);
     if(index != -1){
@@ -37,6 +40,7 @@ class TypeListBuilderState extends State<TypeListBuilder> {
     setState(() {});
   }
 
+  /// Filters the list by name of type
   void _filterList(String query){
     final List<TypeModel> filteredList = widget.typeList.where((type){
       return type.name.toUpperCase().contains(query.toUpperCase()) || type.description.toUpperCase().contains(query.toUpperCase());
@@ -47,6 +51,8 @@ class TypeListBuilderState extends State<TypeListBuilder> {
     });
   }
 
+  /// Called when an item of the list if tapped.
+  /// Opens the update form of the tapped item
   void tapItem(TypeModel type) async {
     final updatedItem = await Navigator.push(context, MaterialPageRoute(builder:
     (context) => TypeFormScreen(toUpdateType: type,)

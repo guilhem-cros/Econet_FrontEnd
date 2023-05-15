@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 
 import 'account/handler_auth_screen.dart';
 
+/// Handler of screens for the App
 class Wrapper extends StatelessWidget{
 
   @override
   Widget build(BuildContext context){
 
+    /// Connected firebase user
     final user =  Provider.of<FirebaseUser?>(context);
 
     if(user == null)
@@ -20,7 +22,7 @@ class Wrapper extends StatelessWidget{
     {
       return Handler();
     }
-    else {
+    else { // if an user is connected
             return Home(firebaseId: user.uid!);
     }
 

@@ -13,7 +13,11 @@ import 'package:image_upload/utils/extensions.dart';
 import '../../../DAOs/type_DAO.dart';
 import '../../../widgets/image_picker.dart';
 
+/// Widget corresponding to the generalized type form (create and update)
 class TypeForm extends StatefulWidget {
+
+  /// Type to update, used to prefill the form.
+  /// Null if it's a creation form
   final TypeModel? toUpdateType;
 
   const TypeForm({super.key, this.toUpdateType});
@@ -31,7 +35,9 @@ class _TypeFormState extends State<TypeForm>{
   PlatformFile? selectedImage;
   Color? selectedColor;
 
+  /// True if form is currently submitting, false if not
   late bool _isUploading;
+  /// True if creation form (toUpdateType==null), false if not
   late bool isCreation;
 
   final Storage storage = Storage();
@@ -39,6 +45,7 @@ class _TypeFormState extends State<TypeForm>{
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  /// Opens an informative popup
   void showPopUp(BuildContext context, String message){
     showDialog(
       context: context,
@@ -74,6 +81,9 @@ class _TypeFormState extends State<TypeForm>{
     });
   }
 
+  /// Called after successful submission.
+  /// Reload the current client to update types into ecospot list.
+  /// Show a success message and close the form
   void hasBeenSumitted(TypeModel type) async {
     if(!isCreation){
       ClientDAO clientDAO = ClientDAO();
@@ -193,6 +203,7 @@ class _TypeFormState extends State<TypeForm>{
   @override
   Widget build(BuildContext context) {
 
+    /// TextField corresponding to the type name
     final typeNameField = TextFormField(
       controller: _typeName,
       autofocus: false,
@@ -216,7 +227,7 @@ class _TypeFormState extends State<TypeForm>{
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none))
     );
 
-
+    /// TextFiel corresponding to the type description
     final descriptionField = TextFormField(
       maxLines: 3,
       keyboardType: TextInputType.multiline,
@@ -242,6 +253,7 @@ class _TypeFormState extends State<TypeForm>{
           OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none))
     );
 
+    /// Dialog box handling the color selection
     final colorPicker = AlertDialog(
       title: Text("Choisissez une couleur"),
       content: SingleChildScrollView(
@@ -261,6 +273,7 @@ class _TypeFormState extends State<TypeForm>{
       ],
     );
 
+    /// Widget opening the color picker
     final colorButton = ElevatedButton.icon(
         icon: Icon(Icons.format_color_fill_rounded, color: Colors.black.withOpacity(0.55),),
         label: Text("Choisir une couleur",

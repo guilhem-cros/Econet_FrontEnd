@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomBackButton extends StatelessWidget{
 
+  /// Function called when back button is pressed
   final void Function()? onPressed;
 
   const CustomBackButton({super.key, this.onPressed});

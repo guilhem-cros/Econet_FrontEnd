@@ -1,6 +1,9 @@
 ///A model representing an user based on his Firebase identifier
 class FirebaseUser {
+
+  /// Firebase uid of the user
   final String? uid ;
-  final String? code; //code firebaseauth excemption
+  /// Firebase exception code
+  final String? code;
   FirebaseUser({this.uid,this.code});
 }

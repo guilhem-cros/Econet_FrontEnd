@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'ecospot.dart';
 
+/// Currently displayed ecospot on a card in the app
 class DisplayedEcospot extends ChangeNotifier{
   EcospotModel? _value;
 

@@ -8,8 +8,10 @@ import '../../models/type.dart';
 import '../../widgets/custom_buttons/back_button.dart';
 import '../error/error_screen.dart';
 
+/// Generalized Type List screen
 class TypeListScreen extends StatefulWidget{
 
+  /// List of types displayed
   late List<TypeModel> listType ;
 
   TypeListScreen({super.key});
@@ -90,6 +92,7 @@ class TypeListState extends State<TypeListScreen>{
 
 }
 
+/// AppBar of the screen
 class _AppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize = const Size.fromHeight(50.0);

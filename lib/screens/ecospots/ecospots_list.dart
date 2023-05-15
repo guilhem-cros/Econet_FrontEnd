@@ -10,12 +10,18 @@ import '../error/error_screen.dart';
 import '../home/home.dart';
 import 'ecospots_components/ecospot_list_builder/ecospots_list_builder.dart';
 
+/// Generalized screen concerning list of ecospots
 class EcospotsListScreen extends StatefulWidget{
 
+  /// Title of the screen
   final String title;
+  /// True if add button should be displayed
   final bool isButtonVisible;
+  /// True if it's a list of unpublished ecospot
   final bool isPublicationList;
+  /// The list used to build the screen
   final List<EcospotModel> ecospotsList;
+  /// List of every types from the DB, used to filter the list
   late List<TypeModel> listType ;
 
 
@@ -106,6 +112,7 @@ class EcospotsListScreenState extends State<EcospotsListScreen>{
   }
 }
 
+/// AppBar of the screen
 class _AppBar extends StatelessWidget with PreferredSizeWidget{
   @override
   final Size preferredSize = const Size.fromHeight(50.0);

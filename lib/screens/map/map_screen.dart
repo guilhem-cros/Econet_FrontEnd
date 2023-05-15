@@ -21,10 +21,14 @@ import '../../models/ecospot.dart';
 import '../ecospots/ecospot_form.dart';
 import '../home/home.dart';
 
+/// Map screen of the application
 class MapScreen extends StatefulWidget {
 
+  /// List of published ecospots
   final List<EcospotModel>? ecospots;
+  /// Error message if an error occurs
   final String errMsg;
+  /// Function called when the reload button is clicked
   final Future<void> Function() reload;
 
   const MapScreen({super.key, this.ecospots, this.errMsg = "", required this.reload});
@@ -35,7 +39,9 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
 
+  /// Future permission about location given by the user
   late Future<LocationPermission> permissionStatus;
+  /// Currently displayed ecospots
   late List<EcospotModel> displayedEcospots;
 
   bool loadingMarkers = false;
@@ -44,6 +50,7 @@ class _MapScreenState extends State<MapScreen> {
   Map<String, BitmapDescriptor> loadedUrl = {};
   LatLng? searchedLocation;
 
+  /// Opens an error popup concerning the loading of ecospots
   void showError(BuildContext context){
     showDialog(
       context: context,
@@ -64,6 +71,7 @@ class _MapScreenState extends State<MapScreen> {
     return await Geolocator.requestPermission();
   }
 
+  /// Loads an image as icon from an url and returns it
   Future<Uint8List> _loadMarkerIcon(String url) async {
     http.Response response = await http.get(Uri.parse(url));
     final Uint8List bytes = response.bodyBytes;
@@ -92,6 +100,7 @@ class _MapScreenState extends State<MapScreen> {
     toUpdate.sort((a, b) => a.name.toUpperCase().compareTo(b.name.toUpperCase()));
   }
 
+  /// Update a specified ecospot into every useful list and update the markers
   void updateLists(EcospotModel toUpdate){
     updateEcospotInList(toUpdate, widget.ecospots!);
     updateEcospotInList(toUpdate, displayedEcospots);
@@ -101,6 +110,7 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {});
   }
 
+  /// Delete an ecospot in a specified list
   void deleteIn(EcospotModel toDelete, List<EcospotModel> list){
     int index = list.indexWhere((spot) => spot.id == toDelete.id);
     if(index!=-1){
@@ -108,6 +118,7 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  /// Delete the specified ecospot from every lists and remove it from markers
   void onDelete(EcospotModel toDelete){
 
     final EcospotDAO dao = EcospotDAO();
@@ -125,6 +136,7 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {});
   }
 
+  /// Add / remove an ecospot from the list of fav ecospots of the currently connected client
   void onFav(bool isFav, EcospotModel ecospot){
     if(isFav){
       Home.currentClient!.favEcospots.add(ecospot);
@@ -136,6 +148,7 @@ class _MapScreenState extends State<MapScreen> {
     clientDAO.updateClient(updateClient: Home.currentClient!);
   }
 
+  /// Opens the card linked to the DisplayedEcospot
   void showSpotInfo() async {
     await showDialog(context: context,
         builder: (context) {
@@ -173,6 +186,7 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
+  /// Fill the markers with every ecospot to display
   void fillMarkers() async {
     setState(() {
       _markers.clear();
@@ -216,6 +230,7 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
+  /// Add an ecospot to every list of ecospot and to the map markers if the client is an admin (ecospot published)
   void hasCreated() async {
     final addedItem = await Navigator.push<EcospotModel>(context, MaterialPageRoute(builder:
         (context) => const EcospotFormScreen(isPublicationForm: false,)

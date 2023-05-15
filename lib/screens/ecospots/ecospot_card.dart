@@ -11,11 +11,17 @@ import 'ecospot_form.dart';
 ///Custom widget corresponding to a card containing info about an Ecospot
 class EcospotCard extends StatefulWidget {
 
+  /// Currently displayed ecospot on the card
   final EcospotModel displayedEcospot;
+  /// List of fav ecospots of the currently connected client
   final List<EcospotModel> favEcospots;
+  /// Admin state of the currently connected client
   final bool isAdmin;
+  /// Function called after an update on the displayed ecospot
   final void Function(EcospotModel) onUpdate;
+  /// Function called after deleted the displayed ecospot
   final void Function() onDelete;
+  /// Function called after changing the fav state of the ecospot on the card
   final void Function(bool) onFav;
 
   const EcospotCard({
@@ -55,6 +61,7 @@ class _EcospotCardState extends State<EcospotCard> {
     });
   }
 
+  /// Called when fav logo is clicked
   void setFav(){
     setState(() {
       _isFav = !_isFav;
@@ -63,6 +70,7 @@ class _EcospotCardState extends State<EcospotCard> {
     widget.onFav(_isFav);
     }
 
+  /// Fetch every secondary types of the ecospot from the DB
   void fetchOtherTypes(List<String> typesIds) async {
     setState(() {
       loadingOtherTypes = true;
@@ -87,6 +95,7 @@ class _EcospotCardState extends State<EcospotCard> {
     });
   }
 
+  /// Returns a string containing the name of each secondary type of the displayed ecospot
   String printOtherTypes(){
     if(otherTypes.isEmpty){
       return "...";
@@ -138,6 +147,8 @@ class _EcospotCardState extends State<EcospotCard> {
       },
     );
 
+    /// Called when delete button is clicked.
+    /// Asks for confirmation to delete the ecospot into a pop up
     void confirmDelete(){
       showDialog(
           context: context,
@@ -179,6 +190,7 @@ class _EcospotCardState extends State<EcospotCard> {
       Navigator.pop(context, false);
     }
 
+    /// Widget containing button handling navigation about the card
     final buttonsBox = Column(
       children: [
         const SizedBox(height: 15),

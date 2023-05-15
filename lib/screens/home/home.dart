@@ -7,8 +7,12 @@ import 'package:image_upload/screens/error/error_screen.dart';
 import 'package:image_upload/screens/map/map_screen.dart';
 import 'package:flutter/material.dart';
 
+/// Home page of the app
 class Home extends StatefulWidget{
+
+  /// Firebase uid of the connected client
   final String firebaseId;
+  /// Currently connected client
   static ClientModel? currentClient;
 
   const Home({super.key, required this.firebaseId});
@@ -21,18 +25,23 @@ class Home extends StatefulWidget{
 
 class _Home extends State<Home>{
 
+  /// Currently connected client fetched from the DB
   late Future<APIResponse<ClientModel>> _clientModel;
+  /// List of published ecospots fetched from the DB
   late Future<APIResponse<List<EcospotModel>>> ecospots;
   late int _reloadCount;
   final ClientDAO clientDAO = ClientDAO();
   final EcospotDAO ecospotDAO = EcospotDAO();
+  /// Ecospots to display on the map
   List<EcospotModel>? listToSend;
+  /// Error message returned during the fetch of ecospots
   String errMsg="";
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
   GlobalKey<RefreshIndicatorState>();
 
 
+  /// Fetch published ecospots from the DB and store them into listToSend
   Future<void> _reloadData() async {
     final response = await ecospotDAO.getPublishedEcoSpots();
     setState(() {
@@ -57,6 +66,7 @@ class _Home extends State<Home>{
     Home.currentClient = clientModel;
   }
 
+  /// Refetch the client
   void reloadClientModel(){
     setState(() {
       _reloadCount++;

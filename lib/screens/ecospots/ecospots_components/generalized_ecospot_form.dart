@@ -19,9 +19,15 @@ import '../../../widgets/custom_buttons/icon_button.dart';
 import '../../../widgets/location_research/search_location.dart';
 import '../../error/error_screen.dart';
 
+/// Widget corresponding to the ecospot generalized form (create and update)
 class EcospotForm extends StatefulWidget{
+
+  /// List of types that can be associate to an ecospot
   late List<TypeModel>? typeList;
+  /// Admin state of the currently connected client
   final bool isAdmin;
+  /// The ecospot to update if it's an update form.
+  /// Null if it's a creation form
   final EcospotModel? toUpdateEcospot;
 
   EcospotForm({super.key, required this.isAdmin, this.toUpdateEcospot});
@@ -49,8 +55,9 @@ class _EcospotForm  extends State<EcospotForm>{
   final GlobalKey<FormFieldState> _addressFieldKey = GlobalKey<FormFieldState>();
   List<String> _suggestedAddresses = [];
 
-
+  /// True if form is currently submitting, false if not
   late bool _isUploading;
+  /// True if it's a creation from (toUploadEcospot == null), fals if it's an update
   late bool isCreation;
 
   PlatformFile? selectedImage;
@@ -62,6 +69,7 @@ class _EcospotForm  extends State<EcospotForm>{
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  /// Opens an informative popup
   void showPopUp(BuildContext context, String message){
     showDialog(
       context: context,
@@ -79,7 +87,7 @@ class _EcospotForm  extends State<EcospotForm>{
     super.initState();
     _typeList = typeDAO.getAll();
     _isUploading = false;
-    if(!isCreation){
+    if(!isCreation){ //if update : prefill the form
       NetworkUtility.getPlaceAddress(widget.toUpdateEcospot!.address).then((address) {
         setState(() {
           _spotName = TextEditingController(text: widget.toUpdateEcospot!.name);
@@ -110,6 +118,8 @@ class _EcospotForm  extends State<EcospotForm>{
     });
   }
 
+  /// Called after successful submission.
+  /// Show an informative message confirming the operation and close the form
   void hasBeenSubmitted(EcospotModel ecospotModel){
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: widget.isAdmin? const Text(
@@ -124,24 +134,28 @@ class _EcospotForm  extends State<EcospotForm>{
     selectedImage = newFile;
   }
 
+  /// Upload the currently selected picture to the firebase storage and returns
+  /// the storage url for this image
   Future<String> uploadImage() async {
     String url = await storage.uploadFile(
         selectedImage!.path!, selectedImage!.name, 'ecospots');
     return url;
   }
 
+  /// Checks the good completion of the form
+  /// and handle the creation of ecospot
   void create() async {
-    if (selectedImage != null) {
+    if (selectedImage != null) { //if an image has been selected
       try {
         final checkResult = await ecospotDAO.checkAddressUnique(
           address: _spotAddress.text,
-        );
+        ); // check that selected adress is unique
         if (!checkResult.error) {
-          if (!checkResult.data!['isUnique']) {
+          if (!checkResult.data!['isUnique']) { // if adress isn't unique : open an informative pop up and break the submit
             setUpload(false);
             showPopUp(context, checkResult.data!['errorMessage']);
-          } else {
-            final urlPic = await uploadImage();
+          } else { //adress is unique
+            final urlPic = await uploadImage(); // uploading the selected image to firebase storage
             APIResponse<EcospotModel> result = await ecospotDAO.createEcospot(
                 name: _spotName.text,
                 address: latLngString!,
@@ -151,16 +165,16 @@ class _EcospotForm  extends State<EcospotForm>{
                 otherTypes: selectedSecondaryTypeIds,
                 pictureUrl: urlPic,
                 isPublished: Home.currentClient!.isAdmin,
-                clientId: Home.currentClient!.id);
-            if (result.error) {
+                clientId: Home.currentClient!.id); // create the ecospot into the DB
+            if (result.error) { // if an error occurs during request to DB : show a popup and break the submission
               setUpload(false);
               showPopUp(context, result.errorMessage!);
             }
-            else {
+            else { // creation successful
               hasBeenSubmitted(result.data!);
             }
           }
-        } else {
+        } else { //error occurs during the check of unique address
           setUpload(false);
           showPopUp(context, checkResult.errorMessage!);
         }
@@ -170,35 +184,37 @@ class _EcospotForm  extends State<EcospotForm>{
         showPopUp(context, e.toString());
       }
     }
-    else {
+    else { // no selected image
       setUpload(false);
       showPopUp(context, "Veuillez sélectionner une image");
     }
   }
 
+  /// Checks the good completion of the form
+  /// and handle the update of ecospot
   void update() async {
     try{
-      bool uploadable = true;
-      if(_spotAddress.text != initialAddressValue){
+      bool uploadable = true; //true if the form is well filled, false if not
+      if(_spotAddress.text != initialAddressValue){ //adress has been changed
         final checkResult = await ecospotDAO.checkAddressUnique(
           address: _spotAddress.text,
-        );
+        ); //check unicity of address
         if (!checkResult.error) {
-          if (!checkResult.data!['isUnique']) {
+          if (!checkResult.data!['isUnique']) { // if address isn't unique
             uploadable = false;
             setUpload(false);
             showPopUp(context, checkResult.data!['errorMessage']);
           }
         }
-        else{
+        else{ //error during the address check
           uploadable = false;
           setUpload(false);
           showPopUp(context, checkResult.errorMessage!);
         }
       }
 
-      if(uploadable){
-        if(selectedImage!=null){
+      if(uploadable){ // form is well filled
+        if(selectedImage!=null){ // if image has been changed : upload the new one into firebase storage
           widget.toUpdateEcospot!.pictureUrl = await uploadImage();
         }
         APIResponse<EcospotModel> result = await ecospotDAO.updateEcospot(
@@ -211,11 +227,11 @@ class _EcospotForm  extends State<EcospotForm>{
             otherTypes: selectedSecondaryTypeIds,
             pictureUrl: widget.toUpdateEcospot!.pictureUrl,
             isPublished: Home.currentClient!.isAdmin
-        );
-        if(result.error){
+        ); //update the ecospot in the DB
+        if(result.error){ //error occurs
           setUpload(false);
           showPopUp(context, result.errorMessage!);
-        } else{
+        } else{ // success
           hasBeenSubmitted(result.data!);
         }
       }
@@ -226,7 +242,8 @@ class _EcospotForm  extends State<EcospotForm>{
     }
   }
 
-
+  /// Widget corresponding to the dropdown list handling the selection
+  /// of the main type for the ecospot
   Widget spotTypeDropdown() {
     TypeModel? getTypeById(String? id) {
 
@@ -271,6 +288,7 @@ class _EcospotForm  extends State<EcospotForm>{
     );
   }
 
+  /// Widget corresponding and handling the selection list of secondary types
   Widget secondaryTypesDropdown() {
     List<TypeModel> secondaryTypes = widget.typeList!
         .where((type) => type.id != selectedTypeId)
@@ -310,6 +328,7 @@ class _EcospotForm  extends State<EcospotForm>{
   @override
   Widget build(BuildContext context) {
 
+    /// TextField corresponding to the ecospot name
     final spotNameField = TextFormField(
         controller: _spotName,
         autofocus: false,
@@ -332,7 +351,8 @@ class _EcospotForm  extends State<EcospotForm>{
             border:
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
 
-
+    ///TextField corresponding to the address of the ecospot
+    /// Handle the address research and the conversion to LatLng
     final adressField =
     Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,6 +405,7 @@ class _EcospotForm  extends State<EcospotForm>{
     );
 
 
+    /// TextField corresponding to the ecospot details
     final detailsField = TextFormField(
         maxLines: 3,
         keyboardType: TextInputType.multiline,
@@ -410,6 +431,7 @@ class _EcospotForm  extends State<EcospotForm>{
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
 
 
+    /// TextField corresponding to the tips
     final tipsField = TextFormField(
         maxLines: 3,
         keyboardType: TextInputType.multiline,
@@ -428,7 +450,8 @@ class _EcospotForm  extends State<EcospotForm>{
             border:
             OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none)));
 
-
+    /// Submit button of the form.
+    /// Handle creation and update of ecospot
     final submitButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
@@ -454,7 +477,7 @@ class _EcospotForm  extends State<EcospotForm>{
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
           textAlign: TextAlign.center,
         ): const Text(
-          "Publier", //Ou publier si update
+          "Publier",
           style: TextStyle(
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
           textAlign: TextAlign.center,

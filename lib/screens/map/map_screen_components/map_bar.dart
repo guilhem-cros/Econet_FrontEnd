@@ -7,12 +7,16 @@ import 'package:image_upload/screens/menu/menu.dart';
 
 import '../../../widgets/location_research/search_location.dart';
 
-
+/// Navigation bar of the MapScreen
 class MapBar extends StatefulWidget{
 
+  /// Currently displayed ecospots on the map
   final List<EcospotModel> currentEcospotsList;
+  /// List of all published ecospots
   final List<EcospotModel> allEcospots;
+  /// Function updating the list of ecospot to display on the map
   final void Function(List<EcospotModel>) updateList;
+  /// Function called after searching for an address into the searchbar
   final void Function(LatLng?) onSearch;
 
   const MapBar({super.key, required this.currentEcospotsList, required this.allEcospots, required this.updateList, required this.onSearch});
@@ -33,6 +37,7 @@ class _MapBarState extends State<MapBar>{
   @override
   Widget build(BuildContext context) {
 
+    /// Opens an informative popup
     void showPopUp(String message){
       showDialog(
         context: context,
@@ -44,6 +49,7 @@ class _MapBarState extends State<MapBar>{
       );
     }
 
+    /// Filter the list of all published ecospots in function of selected filters
     void _filterList() {
       final List<EcospotModel> filteredList = widget.allEcospots.where((ecospot) {
         bool matchesType = selectedEcospotTypes.isEmpty || selectedEcospotTypes.contains(ecospot.mainType.id);
@@ -60,6 +66,9 @@ class _MapBarState extends State<MapBar>{
       widget.updateList(filteredList);
     }
 
+    /// Fetchs every available types from the DB and complete the
+    /// filter menu with those types.
+    /// During the loading of data, a progress indicator is shown instead of the menu button
     void _fetchFilter() async {
       setState(() {
         loadingTypes = true;
@@ -76,6 +85,7 @@ class _MapBarState extends State<MapBar>{
       });
     }
 
+    /// Widget corresponding and handling the filter menu
     Widget buildFilterMenu() {
       return PopupMenuButton<String>(
         padding: const EdgeInsets.only(bottom: 10),
@@ -121,7 +131,7 @@ class _MapBarState extends State<MapBar>{
       );
     }
 
-
+    /// Button redirecting to the menu screen
     final menuButton = ElevatedButton.icon(
       onPressed: (){
         Navigator.push(context, MaterialPageRoute(builder:

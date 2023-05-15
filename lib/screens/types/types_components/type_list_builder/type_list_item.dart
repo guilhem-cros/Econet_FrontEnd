@@ -3,9 +3,13 @@ import 'package:image_upload/utils/extensions.dart';
 
 class TypeListItem extends StatelessWidget {
 
+  /// The type name, main label of the item
   final String typeName;
+  /// The type color, background color of the item (used with reduced opacity)
   final Color typeColor;
+  /// Url to the type logo
   final String typeLogoUrl;
+  /// Function called when the item is tapped
   final void Function()? onTap;
 
   const TypeListItem({super.key, required this.typeName, required this.typeColor, required this.typeLogoUrl, this.onTap});

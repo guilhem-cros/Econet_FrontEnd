@@ -5,8 +5,10 @@ import 'package:image_upload/widgets/custom_buttons/icon_button.dart';
 
 import '../../../services/auth.dart';
 
+/// Menu App Bar
 class MenuAppBar extends StatelessWidget with PreferredSizeWidget{
 
+  /// Function called after the client has been updated
   final void Function() onSubmit;
 
   @override
