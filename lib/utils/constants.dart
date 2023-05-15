@@ -1,6 +1,7 @@
+///Class containing the different useful constants necessary for the application
 class Constants {
 
-  //API related
+  ///API related
   static String baseUrl = 'https://us-central1-econet-api.cloudfunctions.net/api';
   static String clientEndpoint = '/client';
   static String firebaseEndpoint = '/byFirebaseId/';

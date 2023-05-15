@@ -7,7 +7,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_upload/utils/extensions.dart';
 
+///Class containing some network related functions
 class NetworkUtility{
+
   static Future<String?> fetchUrl(Uri uri, {Map<String, String>? headers}) async{
     try{
       final response = await http.get(uri, headers: headers);
@@ -20,6 +22,10 @@ class NetworkUtility{
     return null;
   }
 
+  ///Return the address corresponding to the given LatLng
+  ///
+  /// Parameters:
+  /// - latLng: String -> The LatLng (string format) for which we want the correspondind address
   static Future<String> getPlaceAddress(String latLng) async {
     double lat = latLng.toLocation().latitude;
     double long = latLng.toLocation().longitude;
@@ -38,11 +44,16 @@ class NetworkUtility{
     }
   }
 
+  ///Return the LatLng object corresponding to the current position of the user
   static Future<LatLng> getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     return LatLng(position.latitude, position.longitude);
   }
 
+  ///Return the LatLng corresponding to the given address
+  ///
+  /// Parameters:
+  /// - address: String -> The address for which we want the corresponding LatLng
   static Future<LatLng> getLatLng(String address) async {
     Uri uri = Uri.https(
         "maps.googleapis.com",
