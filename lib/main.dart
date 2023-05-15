@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_upload/models/displayed_ecospot.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,10 @@ void main() async{
   await Firebase.initializeApp();
   await dotenv.load(fileName: "lib/.env");
   runApp(MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 }
 
 class MyApp extends StatelessWidget{

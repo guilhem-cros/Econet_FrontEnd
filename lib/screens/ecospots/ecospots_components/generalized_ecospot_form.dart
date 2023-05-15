@@ -373,7 +373,7 @@ class _EcospotForm  extends State<EcospotForm>{
                 border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(32.0), borderSide: BorderSide.none))),
         ),
-        Padding(padding: EdgeInsets.only(top: 13,left: 5), child:
+        Padding(padding: EdgeInsets.only(top: 11,left: 5), child:
           CustomIconButton(onPressed: () async{
             _spotAddress.text = "Ma position actuelle";
             LatLng currentLocation = await NetworkUtility.getCurrentLocation();

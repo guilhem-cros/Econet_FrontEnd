@@ -40,14 +40,14 @@ class AdminMenu extends StatelessWidget{
                 )],
               ),
               const SizedBox(height: 125,),
-              MenuItem(label: "Données Analytiques", icon: const Icon(Icons.data_thresholding_outlined), iconColor: iconColor,
-                  onTap: () { print("Analytics todo");}
-                /*
-                    Navigator.push(context, MaterialPageRoute(builder:
+              /*MenuItem(label: "Données Analytiques", icon: const Icon(Icons.data_thresholding_outlined), iconColor: iconColor,
+                 onTap: () { print("Analytics todo");}
+
+               Navigator.push(context, MaterialPageRoute(builder:
                         (context) => EcospotsListScreen(title: 'Mes Ecospots', isButtonVisible: true, ecospotsList: Home.currentClient!.createdEcospots)
                     ));
-                  } */
-                ),
+                  }
+                ),*/
               const SizedBox(height: 28,),
               MenuItem(label: "Tous les EcoSpots", icon: const Icon(Icons.map_outlined), iconColor: iconColor,
                   onTap: () {

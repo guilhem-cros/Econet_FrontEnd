@@ -14,6 +14,9 @@ class AuthService {
 
   /// Login to an existing firebase account using an email and a password
   /// Return the logged client
+  ///
+  /// Parameters:
+  /// - login: LoginUser -> object containing the information necessary to login a user
   Future signInEmailPassword(LoginUser login) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -27,6 +30,8 @@ class AuthService {
     }
   }
 
+  /// Login to an existing firebase account using a Google account
+  /// Return the logged client
   Future<FirebaseUser?> signInWithGoogle() async {
     try{
       final clientDAO = ClientDAO();
@@ -71,6 +76,11 @@ class AuthService {
 
   /// Register an user into firebase and then use its firbase id to store the client
   /// into the database
+  ///
+  /// Parameters:
+  /// - login: LoginUser -> object which contains a part of the necessary information to register a user (email, password)
+  /// - fullName: string -> the full name of the user
+  /// - pseudo: string -> the pseudo of the user
   Future registerEmailPassword(LoginUser login, String fullName, String pseudo) async {
     try {
       final clientDAO = ClientDAO();
@@ -104,6 +114,9 @@ class AuthService {
   }
 
   /// Handle the password reset
+  ///
+  /// Parameters:
+  /// - email: string -> the email of the user to which the new password will be send
   Future resetPassword({required String email}) async {
     try{
       return await _auth
@@ -116,6 +129,10 @@ class AuthService {
 
   /// Connects an user using mail and password and update its email into firebase
   /// Throws an exception if an error occurs during process
+  ///
+  /// Parameters:
+  /// - login: LoginUser -> object containing the necessary user credentials
+  /// - newEmail: string -> the new email of the user
   Future updateEmail(LoginUser login, String newEmail) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -130,6 +147,10 @@ class AuthService {
 
   /// Connects an user using mail and password and update its password into firebase
   /// Throws an exception if an error occurs during process
+  ///
+  /// Parameters:
+  /// - login: LoginUser -> object containing the necessary user credentials
+  /// - newPassword: string -> the new password of the user
   Future updatePassword(LoginUser login, String newPassword) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -142,7 +163,6 @@ class AuthService {
     }
   }
 
-  //TODO: Sign in with Google
 
   /// Disconnect the curretly connected user from the firebase instance
   Future signOut() async {
@@ -153,6 +173,7 @@ class AuthService {
     }
   }
 
+  /// Get the token of the currently connected user
   Future<String?> getUserToken() async {
     User? user = _auth.currentUser;
 
