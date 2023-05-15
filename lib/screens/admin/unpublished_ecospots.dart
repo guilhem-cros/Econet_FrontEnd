@@ -4,11 +4,13 @@ import 'package:image_upload/DAOs/ecospot_DAO.dart';
 import 'package:image_upload/models/ecospot.dart';
 
 import '../../models/api_response.dart';
-import '../ecospots_lists/ecospots_list.dart';
+import '../ecospots/ecospots_list.dart';
 import '../error/error_screen.dart';
 
+/// Screen containing the list of all unpublished ecospots
 class UnpublishedEcospotListScreen extends StatefulWidget{
 
+  /// List of unpublished ecospots
   late List<EcospotModel> listUnpublishedEcospot ;
 
   UnpublishedEcospotListScreen({super.key});

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/services/auth.dart';
 
+/// Class handling the password reset of a client by opening a popup
 class PasswordReset{
   static Future<void> resetPassword(BuildContext context, AuthService _auth) async {
     final TextEditingController emailController = TextEditingController();

@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:image_upload/models/displayed_ecospot.dart';
+import 'package:image_upload/models/ecospot.dart';
+import 'package:image_upload/models/type.dart';
 import 'package:image_upload/screens/ecospots/ecospot_form.dart';
 import 'package:image_upload/utils/extensions.dart';
 import 'package:provider/provider.dart';
-import '../../models/displayed_ecospot.dart';
-import '../../models/ecospot.dart';
-import '../../models/type.dart';
-import '../ecospot_list_item.dart';
+import 'ecospot_list_item.dart';
 
 
-class EcospotsList extends StatefulWidget {
+class EcospotsListBuilder extends StatefulWidget {
+
+  /// List of ecospot used to build the list
   final List<EcospotModel> ecospotsList;
+  /// List of type used to build the filter menu of the list
   final List<TypeModel> typeList;
+  /// True is the list contains only unpublished ecospots, false if not
   final bool isPublicationList;
 
-  const EcospotsList({Key? key, required this.ecospotsList, required this.typeList, this.isPublicationList = false,}) : super(key: key);
+  const EcospotsListBuilder({Key? key, required this.ecospotsList, required this.typeList, this.isPublicationList = false,}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _EcospotsList();
+    return _EcospotsListState();
   }
 }
 
-class _EcospotsList extends State<EcospotsList> {
+class _EcospotsListState extends State<EcospotsListBuilder> {
   List<EcospotModel>? _copyList;
   final TextEditingController _searchController = TextEditingController();
   List<String> selectedEcospotTypes = [];
@@ -32,6 +36,7 @@ class _EcospotsList extends State<EcospotsList> {
     _copyList = widget.ecospotsList;
   }
 
+  /// Function filtering list using the type filter menu and the search bar
   void _filterList(String query) {
     final List<EcospotModel> filteredList = widget.ecospotsList.where((ecospot) {
       bool matchesSearch = ecospot.name.toUpperCase().contains(query.toUpperCase()) || ecospot.address.toUpperCase().contains(query.toUpperCase());
@@ -54,8 +59,9 @@ class _EcospotsList extends State<EcospotsList> {
   }
 
 
+  /// Fonction called when an item of the list is tapped
   void tapItem(EcospotModel ecospot) async {
-    if(widget.isPublicationList){
+    if(widget.isPublicationList){ //if publication list : open update form
       final toRemoveItem = await Navigator.push(context, MaterialPageRoute(builder:
       (context) => EcospotFormScreen(toUpdateEcospot: ecospot, isPublicationForm: true)
       ));
@@ -69,12 +75,13 @@ class _EcospotsList extends State<EcospotsList> {
       setState(() {});
     }
 
-    else {
+    else { // close the list and open the map screen on the tapped ecospot card
       Provider.of<DisplayedEcospot>(context, listen: false).value = ecospot;
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
+  /// Widget containing the filter menu of the list, using types
   Widget buildFilterMenu() {
     return PopupMenuButton<String>(
       onSelected: (String value) {

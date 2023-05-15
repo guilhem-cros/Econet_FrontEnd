@@ -3,7 +3,7 @@ import 'package:image_upload/DAOs/ecospot_DAO.dart';
 import 'package:image_upload/models/ecospot.dart';
 
 import '../../widgets/custom_buttons/back_button.dart';
-import '../forms/generalized_ecospot_form.dart';
+import 'ecospots_components/generalized_ecospot_form.dart';
 import '../home/home.dart';
 
 class EcospotFormScreen extends StatelessWidget{

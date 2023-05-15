@@ -8,7 +8,7 @@ import 'package:image_upload/models/displayed_ecospot.dart';
 import 'package:image_upload/utils/extensions.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/ecospot.dart';
+import '../../../models/ecospot.dart';
 
 class MarkedMap extends StatefulWidget {
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/models/type.dart';
-import 'package:image_upload/screens/forms/generalized_type_form.dart';
+import 'package:image_upload/screens/types/types_components/generalized_type_form.dart';
 
 import '../../widgets/custom_buttons/back_button.dart';
 

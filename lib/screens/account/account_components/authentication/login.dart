@@ -1,13 +1,16 @@
-import 'package:image_upload/screens/authenticate/DTOs/loginuser_dto.dart';
+import 'package:image_upload/screens/account/account_components/authentication/password_reset.dart';
+import 'package:image_upload/services/DTOs/loginuser_dto.dart';
 import 'package:image_upload/services/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_upload/screens/authenticate/password_reset.dart';
 import 'package:image_upload/widgets/wave.dart';
 
-
+/// Widget containing the login form
 class Login extends StatefulWidget {
+
+  /// Function called when the register link is clicked
   final Function? toggleView;
-  Login({this.toggleView});
+
+  const Login({super.key, this.toggleView});
 
   @override
   State<StatefulWidget> createState() {

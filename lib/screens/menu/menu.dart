@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/client.dart';
 import 'package:image_upload/screens/admin/admin_menu.dart';
-import 'package:image_upload/screens/ecospots_lists/ecospots_list.dart';
+import 'package:image_upload/screens/ecospots/ecospots_list.dart';
 import 'package:image_upload/screens/home/home.dart';
-import 'package:image_upload/screens/menu/menu_app_bar.dart';
+import 'package:image_upload/screens/menu/menu_components/menu_app_bar.dart';
 import 'package:image_upload/widgets/wave.dart';
 import 'dart:math' as math;
 

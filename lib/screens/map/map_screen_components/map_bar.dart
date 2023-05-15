@@ -5,7 +5,7 @@ import 'package:image_upload/models/ecospot.dart';
 import 'package:image_upload/models/type.dart';
 import 'package:image_upload/screens/menu/menu.dart';
 
-import '../../widgets/search_location.dart';
+import '../../../widgets/location_research/search_location.dart';
 
 
 class MapBar extends StatefulWidget{

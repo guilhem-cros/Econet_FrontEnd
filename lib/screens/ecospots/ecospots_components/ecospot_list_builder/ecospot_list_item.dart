@@ -1,12 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../utils/extensions.dart';
+import 'package:image_upload/utils/extensions.dart';
 
+/// Widget corresponding to an ecospot displayed in a list of ecospot
 class EcospotListItem extends StatelessWidget{
+
+  /// Name of the spot, main label of the list item
   final String spotName;
+  /// Name of the spot main type, secondary label of the list item
   final String spotType;
+  /// Url to the main type logo of the spot, displayed on the right of the list item
   final String imageUrlType;
+  /// Color of the main type of the spot, used with reduced opacity as background color of the item
   final Color spotColor;
+  /// Function called when the item is tapped
   final void Function()? onTap;
 
   const EcospotListItem({super.key, required this.spotName, required this.spotType, required this.imageUrlType, required this.spotColor, this.onTap});
