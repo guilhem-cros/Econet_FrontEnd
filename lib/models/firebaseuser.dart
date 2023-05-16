@@ -5,5 +5,6 @@ class FirebaseUser {
   final String? uid ;
   /// Firebase exception code
   final String? code;
-  FirebaseUser({this.uid,this.code});
+  final String? email;
+  FirebaseUser({this.uid,this.code, this.email});
 }

@@ -17,7 +17,7 @@ class ClientModel {
     required this.id,
     required this.fullName,
     required this.pseudo,
-    required this.email,
+    this.email,
     required this.firebaseId,
     required this.isAdmin,
     required this.profilePicUrl,
@@ -34,7 +34,7 @@ class ClientModel {
   ///The pseudo of the client
   String pseudo;
   ///The email of the client
-  String email;
+  String? email;
   ///The firebase identifier of the client
   String firebaseId;
   ///Indicates if the client is an admin or not
@@ -68,7 +68,6 @@ class ClientModel {
     "_id": id,
     "full_name": fullName,
     "pseudo": pseudo,
-    "email": email,
     "firebaseId": firebaseId,
     "isAdmin": isAdmin,
     "profile_pic_url": profilePicUrl,

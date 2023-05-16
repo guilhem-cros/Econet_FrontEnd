@@ -47,12 +47,11 @@ class AuthService {
       // Once signed in, return the UserCredential
       UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       User? user = userCredential.user;
-
       // Envoie les données à l'API après la création réussie de l'utilisateur
       if (user != null) {
         APIResponse<ClientModel> createdCli = await clientDAO.createClient(
           fullName: user.displayName!,
-          pseudo: user.email!.split('@')[0],//TODO enlever apres le @
+          pseudo: user.email!.split('@')[0],
           email: user.email!,
           firebaseId: user.uid,
         );
@@ -60,7 +59,12 @@ class AuthService {
         if(createdCli.error){
           return FirebaseUser(code: "Server error", uid: null);
         } else {
-          return _firebaseUser(user);
+          await signOut();
+
+          // Once signed in, return the UserCredential
+          UserCredential awaitedUserCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+          User? awaitedUser = awaitedUserCredential.user;
+          return _firebaseUser(awaitedUser);
         }
       }
     }
@@ -89,7 +93,6 @@ class AuthService {
           email: login.email.toString(),
           password: login.password.toString());
       User? user = userCredential.user;
-
       // Envoie les données à l'API après la création réussie de l'utilisateur
       if (user != null) {
         APIResponse<ClientModel> createdCli = await clientDAO.createClient(
@@ -102,7 +105,8 @@ class AuthService {
         if(createdCli.error){
           return FirebaseUser(code: "Server error", uid: null);
         } else {
-          return _firebaseUser(user);
+          await signOut();
+          return await signInEmailPassword(login);
         }
       }
 
@@ -186,7 +190,7 @@ class AuthService {
   }
 
   FirebaseUser? _firebaseUser(User? user) {
-    return user != null ? FirebaseUser(uid: user.uid) : null;
+    return user != null ? FirebaseUser(uid: user.uid, email: user.email) : null;
   }
 
   Stream<FirebaseUser?> get user {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_upload/models/api_response.dart';
 import 'package:image_upload/models/client.dart';
+import 'package:image_upload/models/firebaseuser.dart';
 import 'package:image_upload/services/DTOs/loginuser_dto.dart';
 import 'package:image_upload/services/auth.dart';
 import '../../../DAOs/client_DAO.dart';
@@ -266,19 +267,17 @@ class _GeneralizedClientFormState extends State<GeneralizedClientForm> {
 
             // checking email and pseudo are unique
             final checkResult = creation ?
-            await clientDAO.checkEmailPseudoUnique(
-              email: _email.text,
+            await clientDAO.checkPseudoUnique(
               pseudo: _pseudo.text,
             )
                 :
-            await clientDAO.checkEmailPseudoUniqueForUpdate(
-                email: _email.text,
+            await clientDAO.checkPseudoUniqueForUpdate(
                 pseudo: _pseudo.text,
                 id: widget.toUpdateClient!.id
             );
 
             if (!checkResult.error) {
-              if (!checkResult.data!['isUnique']) { //email or pseudo not unique
+              if (!checkResult.data!['isUnique']) { //pseudo not unique
                 showPopUp(context, checkResult.data!['errorMessage']); // showing an info msg
                 submitted(false); // hiding the progress indicator
               }
@@ -286,12 +285,18 @@ class _GeneralizedClientFormState extends State<GeneralizedClientForm> {
 
                 if (creation) { //creation form
                   try {
-                    await _auth.registerEmailPassword(
+                    final FirebaseUser user = await _auth.registerEmailPassword(
                       LoginUser(email: _email.text, password: _password.text),
                       _fullName.text,
                       _pseudo.text,
                     ); // registering th user into firebase and then into the database
-                    submitted(true);
+                    if(user.uid == null){
+                      showPopUp(context, "L'email saisi est déjà associé à un compte");
+                      submitted(false);
+                      return;
+                    }else {
+                      submitted(true);
+                    }
                   } catch (err) {
                     showPopUp(context, err.toString());
                     submitted(false);
@@ -333,7 +338,9 @@ class _GeneralizedClientFormState extends State<GeneralizedClientForm> {
                     Home.currentClient!.fullName = _fullName.text;
                     APIResponse<ClientModel> result = await clientDAO
                         .updateClient(
-                        updateClient: Home.currentClient!); //updating client into DB
+                        updateClient: Home.currentClient!,
+                        email: _email.text
+                    ); //updating client into DB
                     if (result.error) {
                       showPopUp(context, result.errorMessage!);
                       submitted(false);
