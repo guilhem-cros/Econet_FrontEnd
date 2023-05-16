@@ -84,10 +84,10 @@ class _TypeFormState extends State<TypeForm>{
   /// Called after successful submission.
   /// Reload the current client to update types into ecospot list.
   /// Show a success message and close the form
-  void hasBeenSumitted(TypeModel type) async {
+  void hasBeenSubmitted(TypeModel type) async {
     if(!isCreation){
       ClientDAO clientDAO = ClientDAO();
-      APIResponse<ClientModel> reloadedClient = await clientDAO.getById(id: Home.currentClient!.id);
+      APIResponse<ClientModel> reloadedClient = await clientDAO.getById(id: Home.currentClient!.id, email: Home.currentClient!.email!);
       if(!reloadedClient.error){
         Home.currentClient = reloadedClient.data;
       }
@@ -137,7 +137,7 @@ class _TypeFormState extends State<TypeForm>{
                 setUpload(false);
                 showPopUp(context, result.errorMessage!);
               } else {
-                hasBeenSumitted(result.data!);
+                hasBeenSubmitted(result.data!);
               }
             }
           }
@@ -189,7 +189,7 @@ class _TypeFormState extends State<TypeForm>{
             setUpload(false);
             showPopUp(context, result.errorMessage!);
           } else {
-            hasBeenSumitted(result.data!);
+            hasBeenSubmitted(result.data!);
           }
         }
       }

@@ -12,10 +12,12 @@ class Home extends StatefulWidget{
 
   /// Firebase uid of the connected client
   final String firebaseId;
+  /// Email of the client
+  final String email;
   /// Currently connected client
   static ClientModel? currentClient;
 
-  const Home({super.key, required this.firebaseId});
+  const Home({super.key, required this.firebaseId, required this.email});
 
   @override
   State<StatefulWidget> createState() {
@@ -57,7 +59,7 @@ class _Home extends State<Home>{
   @override
   void initState() {
     super.initState();
-    _clientModel = clientDAO.getByFirebaseId( uid: widget.firebaseId);
+    _clientModel = clientDAO.getByFirebaseId( uid: widget.firebaseId, email: widget.email);
     _reloadCount = 0;
     _reloadData();
   }
@@ -68,10 +70,8 @@ class _Home extends State<Home>{
 
   /// Refetch the client
   void reloadClientModel(){
-    setState(() {
-      _reloadCount++;
-      _clientModel = clientDAO.getByFirebaseId( uid: widget.firebaseId);
-    });
+    _reloadCount++;
+    _clientModel = clientDAO.getByFirebaseId( uid: widget.firebaseId, email: widget.email);
   }
 
   @override

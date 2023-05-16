@@ -145,7 +145,7 @@ class _MapScreenState extends State<MapScreen> {
       Home.currentClient!.favEcospots.removeAt(index);
     }
     final ClientDAO clientDAO = ClientDAO();
-    clientDAO.updateClient(updateClient: Home.currentClient!);
+    clientDAO.updateClient(updateClient: Home.currentClient!, email: Home.currentClient!.email!);
   }
 
   /// Opens the card linked to the DisplayedEcospot

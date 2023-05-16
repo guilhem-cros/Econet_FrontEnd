@@ -16,14 +16,14 @@ class Wrapper extends StatelessWidget{
 
     if(user == null)
     {
-      return Handler();
+      return const Handler();
     }
     else if (user.uid == null)
     {
-      return Handler();
+      return const Handler();
     }
     else { // if an user is connected
-            return Home(firebaseId: user.uid!);
+            return Home(firebaseId: user.uid!,email: user.email!);
     }
 
   }

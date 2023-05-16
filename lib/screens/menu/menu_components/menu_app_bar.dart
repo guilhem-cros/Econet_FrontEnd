@@ -4,6 +4,7 @@ import 'package:image_upload/widgets/custom_buttons/back_button.dart';
 import 'package:image_upload/widgets/custom_buttons/icon_button.dart';
 
 import '../../../services/auth.dart';
+import '../../home/home.dart';
 
 /// Menu App Bar
 class MenuAppBar extends StatelessWidget with PreferredSizeWidget{
@@ -36,6 +37,7 @@ class MenuAppBar extends StatelessWidget with PreferredSizeWidget{
         CustomIconButton(
           onPressed: () async {
             await _auth.signOut();
+            Home.currentClient=null;
             Navigator.pop(context);
           },
           icon: const Icon(Icons.power_settings_new),

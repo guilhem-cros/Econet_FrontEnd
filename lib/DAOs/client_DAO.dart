@@ -36,7 +36,6 @@ class ClientDAO {
         body: jsonEncode({
           'full_name': fullName,
           'pseudo': pseudo,
-          'email': email,
           'firebaseId': firebaseId,
         }),
         headers: {
@@ -45,6 +44,7 @@ class ClientDAO {
       );
 
       final jsonData = json.decode(response.body);
+      jsonData["email"]=email;
       if (response.statusCode == 200 || response.statusCode == 201) {
         return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
       } else {
@@ -56,15 +56,14 @@ class ClientDAO {
     }
   }
 
-  /// Check if a specified string doesn't match any existing email or pseudo in the DB
+  /// Check if a specified string doesn't match any or pseudo in the DB
   /// Return an APIResponse containing the result of the request if no error
   /// An APIResponse containing an error message if not
   ///
   /// Parameters:
   /// - email: string -> the string corresponding to the email to verify
   /// - pseudo: string -> the string corresponding to the pseudo to verify
-  Future<APIResponse<Map<String, dynamic>>> checkEmailPseudoUnique({
-    required String email,
+  Future<APIResponse<Map<String, dynamic>>> checkPseudoUnique({
     required String pseudo,
   }) async {
     final String apiUrl = Constants.baseUrl + Constants.clientEndpoint + Constants.checkEndpoint;
@@ -73,7 +72,7 @@ class ClientDAO {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email, 'pseudo': pseudo}),
+        body: json.encode({'pseudo': pseudo}),
       );
 
       final jsonData = json.decode(response.body);
@@ -90,7 +89,7 @@ class ClientDAO {
     }
   }
 
-  /// Check if a specified string doesn't match any existing email or pseudo in the DB
+  /// Check if a specified string doesn't match any existing pseudo in the DB
   /// but the one of the client linked to the specified id
   /// Return an APIResponse containing the result of the request if no error
   /// An APIResponse containing an error message if not
@@ -99,8 +98,7 @@ class ClientDAO {
   /// - email: string -> the string corresponding to the email to verify
   /// - pseudo: string -> the string corresponding to the pseudo to verify
   /// - id: string -> the id of the client in the database
-  Future<APIResponse<Map<String, dynamic>>> checkEmailPseudoUniqueForUpdate({
-    required String email,
+  Future<APIResponse<Map<String, dynamic>>> checkPseudoUniqueForUpdate({
     required String pseudo,
     required String id
   }) async {
@@ -110,7 +108,7 @@ class ClientDAO {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email, 'pseudo': pseudo}),
+        body: json.encode({'pseudo': pseudo}),
       );
 
       final jsonData = json.decode(response.body);
@@ -134,7 +132,7 @@ class ClientDAO {
   ///
   /// Parameters:
   /// - uid: string -> the firebaseId of the client for who we need more information
-  Future<APIResponse<ClientModel>> getByFirebaseId({required String uid}) async{
+  Future<APIResponse<ClientModel>> getByFirebaseId({required String uid, required String email}) async{
     final String apiUrl = Constants.baseUrl + Constants.clientEndpoint + Constants.firebaseEndpoint + uid;
 
 
@@ -150,6 +148,7 @@ class ClientDAO {
       );
 
       final jsonData = json.decode(response.body);
+      jsonData["email"]=email;
       if (response.statusCode == 200) {
         return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
       }
@@ -167,7 +166,7 @@ class ClientDAO {
   ///
   /// Parameters:
   /// - id: string -> the id of the client for who we need more information
-  Future<APIResponse<ClientModel>> getById({required String id}) async{
+  Future<APIResponse<ClientModel>> getById({required String id, required String email}) async{
     final String apiUrl = '${Constants.baseUrl}${Constants.clientEndpoint}/$id';
 
     try {
@@ -183,6 +182,7 @@ class ClientDAO {
       );
 
       final jsonData = json.decode(response.body);
+      jsonData["email"]=email;
       if (response.statusCode == 200) {
         return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
       }
@@ -204,6 +204,7 @@ class ClientDAO {
   /// information to update
   Future<APIResponse<ClientModel>> updateClient({
     required ClientModel updateClient,
+    required String email
   }) async {
     final String apiUrl = '${Constants.baseUrl}${Constants.clientEndpoint}/${updateClient.id}';
 
@@ -221,6 +222,7 @@ class ClientDAO {
       );
 
       final jsonData = json.decode(response.body);
+      jsonData["email"]=email;
       if (response.statusCode == 200) {
         return APIResponse<ClientModel>(data: ClientModel.fromJson(jsonData));
       } else {

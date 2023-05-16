@@ -67,7 +67,7 @@ class MenuState extends State<Menu>{
     }catch(err){
       gotError=true;
     }
-    var result = await widget.clientDAO.updateClient(updateClient: Home.currentClient!);
+    var result = await widget.clientDAO.updateClient(updateClient: Home.currentClient!, email: Home.currentClient!.email!);
     setState(() {
       isLoading = false;
     });
