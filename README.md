@@ -1,5 +1,6 @@
 # Econet FrontEnd
 
+This is our first Flutter project.
 Interface of an Android app, centered on an interactive map.
 
 ## Getting Started
