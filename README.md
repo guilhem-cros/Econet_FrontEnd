@@ -1,16 +1,18 @@
-# image_upload
+# Econet FrontEnd
 
-A new Flutter project.
+Interface of an Android app, centered on an interactive map.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+1. Make sure you have Flutter and Dart installed. If not, install Flutter and set up your editor.
+2. Clone the repository
+3. Get the required packages: `flutter pub get`
+4. Change the API related constants to yours in `lib/utils/constants.dart`
+5. In folder `lib` create a `.env` file containing ```API_KEY=YOUR_API_KEY``` with your Google Map API key, see [https://developers.google.com/maps/documentation/javascript/get-api-key](url)
+6. Run the app on your device/emulator : `flutter run`
 
-A few resources to get you started if this is your first Flutter project:
+## Note
+- The app needs to be linked to the associated BackEnd server to run, see this repo : [https://github.com/guilhem-cros/BackEnd-Econet](url)
+- 
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
